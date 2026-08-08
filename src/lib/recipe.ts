@@ -1,5 +1,4 @@
 import { colorDistance, hexToRgb, rgbToHex, type MixResult } from './color-math'
-import { MAX_COLORS } from './constants'
 import type { ColorItem, MatchBadge, RecipeItem, SortMode, UnitMode, ViewModel } from '../types'
 
 const MAX_RGB_DISTANCE = Math.sqrt(3) * 255
@@ -59,22 +58,38 @@ export function buildViewModel(
   const targetRgb = hexToRgb(target)
   const parts = simplifyRatio(weights)
 
-  let rows = colors.map((color, index) => {
-    const percent = Math.round((weights[index] ?? 0) * 100)
-    const mlAmount = Math.round((percent / 100) * totalMl)
-    return {
-      ...color,
-      percent,
-      mlAmount,
-      parts: parts[index] ?? 0,
-      percentWidth: `${percent}%`,
-      displayValue: unitMode === 'ml' ? `${mlAmount} ml` : `${percent}%`,
-      displayName: color.name.trim() ? color.name.trim() : `Color ${index + 1}`,
-      hexUpper: color.hex.toUpperCase(),
-    }
-  })
+  // A weight that rounds to 0.0% at one decimal is treated as a true zero and
+  // dropped from the mix ratio entirely (matches the solver's own visible-row
+  // convention). Anything above that threshold stays, even if it rounds to a
+  // bare "0%" at whole-percent precision — those show as "<1%"/"<1 ml"
+  // instead, so a real (if small) contribution never reads as "not used".
+  let rows = colors
+    .map((color, index) => ({ color, index, weight: weights[index] ?? 0 }))
+    .filter(({ weight }) => Number((weight * 100).toFixed(1)) > 0)
+    .map(({ color, index, weight }) => {
+      const exactPercent = weight * 100
+      const exactMl = weight * totalMl
+      const percent = Math.round(exactPercent)
+      const mlAmount = Math.round(exactMl)
+      const belowOnePercent = percent === 0
+      const belowOneMl = mlAmount === 0
 
-  if (sortMode === 'percent-desc') rows = [...rows].sort((a, b) => b.percent - a.percent)
+      return {
+        ...color,
+        percent,
+        exactPercent,
+        mlAmount,
+        parts: parts[index] ?? 0,
+        percentWidth: `${exactPercent}%`,
+        displayValue:
+          unitMode === 'ml' ? (belowOneMl ? '<1 ml' : `${mlAmount} ml`) : belowOnePercent ? '<1%' : `${percent}%`,
+        exactLabel: unitMode === 'ml' ? `${exactMl.toFixed(2)} ml` : `${exactPercent.toFixed(1)}%`,
+        displayName: color.name.trim() ? color.name.trim() : `Color ${index + 1}`,
+        hexUpper: color.hex.toUpperCase(),
+      }
+    })
+
+  if (sortMode === 'percent-desc') rows = [...rows].sort((a, b) => b.exactPercent - a.exactPercent)
 
   const recipeItems: RecipeItem[] = rows
     .filter((row) => row.parts > 0)
@@ -90,7 +105,6 @@ export function buildViewModel(
     }))
 
   const match = colors.length ? computeMatch(mixedRgb, targetRgb) : 0
-  const addDisabled = colors.length >= MAX_COLORS
 
   return {
     hasEnoughColors: colors.length >= 2,
@@ -101,8 +115,6 @@ export function buildViewModel(
     matchBadge: matchBadgeFor(match),
     colors: rows,
     recipeItems,
-    addDisabled,
-    addButtonLabel: addDisabled ? 'Max colors reached' : 'Custom color',
     colorCountLabel: `${colors.length} color${colors.length === 1 ? '' : 's'}`,
   }
 }

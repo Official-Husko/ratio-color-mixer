@@ -142,7 +142,12 @@ export function EstimatedMixCard({
                   </div>
                   <div style={{ fontSize: 11.5, color: 'var(--text-muted)', fontFamily: 'var(--mono)' }}>{row.hexUpper}</div>
                 </div>
-                <div style={{ fontFamily: 'var(--mono)', fontWeight: 600, fontSize: 18, flex: 'none' }}>{row.displayValue}</div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flex: 'none' }}>
+                  <div style={{ fontFamily: 'var(--mono)', fontWeight: 600, fontSize: 18 }}>{row.displayValue}</div>
+                  <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--text-muted)' }}>
+                    ({row.exactLabel})
+                  </div>
+                </div>
               </div>
             ))}
           </div>

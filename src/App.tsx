@@ -19,8 +19,6 @@ export function App() {
           <YourColorsCard
             colors={colors}
             canSimplify={viewModel.canSimplify}
-            addDisabled={viewModel.addDisabled}
-            addButtonLabel={viewModel.addButtonLabel}
             colorCountLabel={viewModel.colorCountLabel}
             onCustomColorPicked={actions.addCustomColor}
             onSimplify={actions.simplifyMix}

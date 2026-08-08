@@ -9,11 +9,17 @@ export interface ColorItem {
 }
 
 export interface MixColorRow extends ColorItem {
+  /** Rounded to the nearest whole percent — 0 only ever appears as "<1%" in displayValue, never bare "0%". */
   percent: number
+  /** Unrounded percent contribution, e.g. 0.4 — used for sorting and shown exactly in exactLabel. */
+  exactPercent: number
   mlAmount: number
   parts: number
   percentWidth: string
+  /** Rounded for normal rows; "<1%"/"<1 ml" for a nonzero contribution that would otherwise round to 0. */
   displayValue: string
+  /** Unrounded value formatted for the current unit mode, e.g. "0.4%" or "1.25 ml" — meant for a tooltip. */
+  exactLabel: string
   displayName: string
   hexUpper: string
 }
@@ -40,8 +46,6 @@ export interface ViewModel {
   matchBadge: MatchBadge
   colors: MixColorRow[]
   recipeItems: RecipeItem[]
-  addDisabled: boolean
-  addButtonLabel: string
   colorCountLabel: string
 }
 

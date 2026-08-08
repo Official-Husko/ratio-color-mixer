@@ -9,8 +9,6 @@ import { Icon } from './ui/Icon'
 interface YourColorsCardProps {
   colors: ColorItem[]
   canSimplify: boolean
-  addDisabled: boolean
-  addButtonLabel: string
   colorCountLabel: string
   onCustomColorPicked: (hex: string) => void
   onSimplify: () => void
@@ -23,8 +21,6 @@ interface YourColorsCardProps {
 export function YourColorsCard({
   colors,
   canSimplify,
-  addDisabled,
-  addButtonLabel,
   colorCountLabel,
   onCustomColorPicked,
   onSimplify,
@@ -116,7 +112,6 @@ export function YourColorsCard({
       <button
         type="button"
         onClick={openCustomColorPicker}
-        disabled={addDisabled}
         class="dashed-btn"
         style={{
           width: '100%',
@@ -128,16 +123,15 @@ export function YourColorsCard({
           fontFamily: 'var(--sans)',
           fontWeight: 600,
           fontSize: 13.5,
-          cursor: addDisabled ? 'default' : 'pointer',
-          opacity: addDisabled ? 0.6 : 1,
+          cursor: 'pointer',
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
           gap: 8,
         }}
       >
-        {!addDisabled && <Icon name="plus" />}
-        {addButtonLabel}
+        <Icon name="plus" />
+        Custom color
       </button>
 
       <input

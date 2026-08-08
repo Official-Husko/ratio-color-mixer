@@ -6,19 +6,19 @@ import { buildShareUrl, decodeShareState } from '../lib/share-link'
 import { loadState, saveState } from '../lib/storage'
 import { naturalCoordsFromClick, readFileAsDataUrl, sampleImagePixel } from '../lib/image-sample'
 import { buildRecipeImageCanvas, downloadCanvasAsPng } from '../lib/image-export'
+import { generateId } from '../lib/id'
 import {
   DEFAULT_COLORS,
   DEFAULT_TARGET,
   DEFAULT_TOTAL_ML,
   FEEDBACK_DURATION_MS,
-  MAX_COLORS,
   PERSIST_DEBOUNCE_MS,
   SHARE_PARAM,
 } from '../lib/constants'
 import type { ColorItem, FeedbackKind, SharePayload, UnitMode } from '../types'
 
 function withId(color: { hex: string; name: string }): ColorItem {
-  return { id: crypto.randomUUID(), hex: color.hex, name: color.name }
+  return { id: generateId(), hex: color.hex, name: color.name }
 }
 
 interface InitialState {
@@ -33,7 +33,7 @@ function resolveInitialState(): InitialState {
   const shared = typeof location !== 'undefined' ? decodeShareState(location.search) : null
   if (shared) {
     return {
-      colors: shared.colors.slice(0, MAX_COLORS).map(withId),
+      colors: shared.colors.map(withId),
       target: shared.target,
       totalMl: shared.totalMl,
       unitMode: shared.unitMode,
@@ -44,7 +44,7 @@ function resolveInitialState(): InitialState {
   const stored = loadState()
   if (stored) {
     return {
-      colors: stored.colors.slice(0, MAX_COLORS).map(withId),
+      colors: stored.colors.map(withId),
       target: stored.target,
       totalMl: stored.totalMl,
       unitMode: stored.unitMode,
@@ -116,11 +116,8 @@ export function useMixerState() {
     [colors, target, solveResult, totalMl, unitMode],
   )
 
-  function addColor(hex: string, name: string): string | null {
-    if (colors.length >= MAX_COLORS) return null
-    const id = crypto.randomUUID()
-    setColors((prev) => [...prev, { id, hex, name }])
-    return id
+  function addColor(hex: string, name: string): void {
+    setColors((prev) => [...prev, { id: generateId(), hex, name }])
   }
 
   function addPreset(hex: string, name: string) {
@@ -177,8 +174,11 @@ export function useMixerState() {
       '',
       ...viewModel.recipeItems.map((item) => `${item.recipeLine} (${item.percent}%)`),
     ]
-    await copyText(lines.join('\n'))
-    flashFeedback('recipe')
+    // navigator.clipboard is only available in secure contexts (HTTPS, or
+    // localhost) — e.g. it's silently absent when testing over `vite --host`
+    // from another device's plain-HTTP LAN address. Only claim success if it
+    // actually copied, instead of always flashing "Copied!".
+    if (await copyText(lines.join('\n'))) flashFeedback('recipe')
   }
 
   function downloadImage() {
@@ -202,8 +202,7 @@ export function useMixerState() {
       unitMode,
       colors: colors.map((c) => ({ hex: c.hex, name: c.name })),
     }
-    await copyText(buildShareUrl(payload))
-    flashFeedback('link')
+    if (await copyText(buildShareUrl(payload))) flashFeedback('link')
   }
 
   return {

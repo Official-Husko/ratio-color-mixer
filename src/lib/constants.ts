@@ -1,4 +1,3 @@
-export const MAX_COLORS = 8
 export const DEFAULT_TOTAL_ML = 250
 
 export const DEFAULT_COLORS = [
