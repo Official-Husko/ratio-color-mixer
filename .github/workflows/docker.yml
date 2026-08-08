@@ -8,8 +8,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: read
-  packages: write
+  contents: write
 
 jobs:
   test:
@@ -43,52 +42,104 @@ jobs:
   docker:
     needs: test
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - name: frontend
-            context: .
-            image_suffix: ""
-          - name: api
-            context: ./server
-            image_suffix: "-api"
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set lowercase image name
-        id: image
-        run: echo "name=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')${{ matrix.image_suffix }}" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to GitHub Container Registry
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Compute short commit SHA
+        id: sha
+        run: echo "short=${GITHUB_SHA:0:7}" >> "$GITHUB_OUTPUT"
 
-      - name: Extract image metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ steps.image.outputs.name }}
-          tags: |
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-            type=sha,prefix=,format=short
-            type=raw,value=latest,enable={{is_default_branch}}
-
-      # On pull requests this builds (to catch a broken Dockerfile) without
-      # pushing, since GITHUB_TOKEN isn't logged in to the registry above.
-      - name: Build and push
+      # Built and loaded into the runner's local Docker daemon only, never
+      # pushed to a registry — the images ship as a downloadable release
+      # artifact instead (see "Bundle release artifact" below).
+      - name: Build frontend image
         uses: docker/build-push-action@v6
         with:
-          context: ${{ matrix.context }}
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=${{ matrix.name }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
+          context: .
+          push: false
+          load: true
+          tags: ratio-color-mixer:${{ steps.sha.outputs.short }}
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
+
+      - name: Build api image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./server
+          push: false
+          load: true
+          tags: ratio-color-mixer-api:${{ steps.sha.outputs.short }}
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,mode=max,scope=api
+
+      # Pull requests stop here: the two builds above already catch a broken
+      # Dockerfile, and PRs don't get a release.
+      - name: Bundle release artifact
+        if: github.event_name != 'pull_request'
+        run: |
+          set -euo pipefail
+          sha="${{ steps.sha.outputs.short }}"
+          mkdir -p release-bundle
+          docker save -o release-bundle/ratio-images.tar \
+            "ratio-color-mixer:$sha" "ratio-color-mixer-api:$sha"
+          cp docker-compose.release.yml release-bundle/docker-compose.yml
+          echo "IMAGE_TAG=$sha" > release-bundle/.env
+          {
+            echo "Ratio -- offline release bundle (build $sha)"
+            echo
+            echo "1. docker load -i ratio-images.tar"
+            echo "2. docker compose up -d"
+            echo
+            echo "This loads the frontend and api images built at commit $sha; no"
+            echo "registry is needed for either of them. docker compose will still"
+            echo "pull redis:7-alpine from Docker Hub on first run."
+            echo
+            echo "The site is then available at http://localhost:8080"
+          } > release-bundle/README.txt
+          tar -czf "ratio-release-$sha.tar.gz" -C release-bundle .
+
+      - name: Determine release metadata
+        if: github.event_name != 'pull_request'
+        id: meta
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            echo "title=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=sha-${{ steps.sha.outputs.short }}" >> "$GITHUB_OUTPUT"
+            echo "title=Build ${{ steps.sha.outputs.short }}" >> "$GITHUB_OUTPUT"
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create release
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          extra_args=()
+          if [[ "${{ steps.meta.outputs.prerelease }}" == "true" ]]; then
+            extra_args+=(--prerelease)
+          fi
+          gh release create "${{ steps.meta.outputs.tag }}" \
+            "ratio-release-${{ steps.sha.outputs.short }}.tar.gz" \
+            --title "${{ steps.meta.outputs.title }}" \
+            --notes "Commit ${{ github.sha }}. Docker images for the frontend and share API, built from this commit — see README.md for load/run instructions." \
+            "${extra_args[@]}"
+
+      # Auto-built releases (tag "sha-*") fire on every push to main and
+      # accumulate fast — prune down to the most recent ones so the releases
+      # page stays usable. Version-tagged releases (v1.2.3) are never touched.
+      - name: Prune old automatic releases
+        if: github.event_name != 'pull_request' && github.ref_type != 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release list --limit 200 --json tagName,createdAt \
+            --jq '[.[] | select(.tagName | startswith("sha-"))] | sort_by(.createdAt) | reverse | .[10:] | .[].tagName' \
+            | xargs -r -n1 gh release delete --yes --cleanup-tag

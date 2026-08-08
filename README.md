@@ -1,8 +1,14 @@
 # Ratio: paint color mixer
 
+[![Docker](https://github.com/Official-Husko/ratio-color-mixer/actions/workflows/docker.yml/badge.svg)](https://github.com/Official-Husko/ratio-color-mixer/actions/workflows/docker.yml)
+[![Latest release](https://img.shields.io/github/v/release/Official-Husko/ratio-color-mixer?include_prereleases)](https://github.com/Official-Husko/ratio-color-mixer/releases/latest)
+[![Preact](https://img.shields.io/badge/Preact-%23673AB8?logo=preact&logoColor=white)](https://preactjs.com/)
+
 A client-side calculator for artists and hobbyists: add the paints you have on hand, set a target color (by hex or by sampling a photo), and get back an estimated mixing ratio, expressed as percentages or as a volume (ml, L, or US fl oz/pint/quart/gallon) for a batch size you choose.
 
 The app itself runs entirely in the browser and persists your work locally (`localStorage`). The one exception is the optional Share Link action: it stores that single palette on a small backend for 30 days (sliding: it resets on every visit) behind a short code, so anyone with the link can open their own independent, editable copy without your original changing. See `public/privacy.html` (linked from the footer) for the plain-language rundown of what that stores.
+
+![Ratio screenshot](.github/assets/screenshot.png)
 
 ## Features
 
@@ -60,7 +66,20 @@ docker run --rm -p 8080:80 ratio-color-mixer
 
 The `api` service reads `REDIS_URL`, `SHARE_TTL_SECONDS` (default 2592000 = 30 days), `RATE_LIMIT_MAX`, and `RATE_LIMIT_WINDOW_MS` from the environment (see `docker-compose.yml` for the defaults).
 
-A GitHub Actions workflow (`.github/workflows/docker.yml`) lints, tests, and builds both the app and the share API on every push and pull request, and publishes both images (`ghcr.io/<owner>/<repo>` and `ghcr.io/<owner>/<repo>-api`) on pushes to `main` (tagged `latest`) and on version tags (`v1.2.3`).
+### Getting a pre-built release instead of building locally
+
+A GitHub Actions workflow (`.github/workflows/docker.yml`) lints, tests, and builds both images on every push and pull request. It doesn't push to a registry; instead, every push to `main` and every version tag (`v1.2.3`) publishes a [GitHub Release](https://github.com/Official-Husko/ratio-color-mixer/releases) with a downloadable `ratio-release-<commit>.tar.gz` bundle attached. That bundle is self-contained: it has both images already baked in via `docker save`, plus a matching `docker-compose.yml` and a `.env` pointing at the right image tag, so running it needs no registry at all:
+
+```sh
+tar -xzf ratio-release-<commit>.tar.gz
+cd ratio-release-<commit>
+docker load -i ratio-images.tar
+docker compose up -d
+```
+
+(`docker compose` still pulls the stock `redis:7-alpine` image from Docker Hub on first run — only the two images this repo builds are bundled offline.)
+
+Releases from a plain push to `main` are tagged `sha-<7-char-commit>` and marked as pre-releases (auto-generated per commit, pruned to the most recent 10 so the releases page doesn't fill up); pushing a `v1.2.3` tag produces a proper, permanent versioned release instead.
 
 ## SEO
 

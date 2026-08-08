@@ -1,0 +1,48 @@
+# Variant of docker-compose.yml for the downloadable release bundle: runs
+# the frontend/api from pre-built images (docker load'ed from the bundle's
+# ratio-images.tar) instead of building them, so `docker compose up` here
+# needs no network access beyond pulling redis:7-alpine. See README.md.
+services:
+  ratio:
+    image: ratio-color-mixer:${IMAGE_TAG:-latest}
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    depends_on:
+      - api
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  api:
+    image: ratio-color-mixer-api:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    depends_on:
+      - redis
+    environment:
+      PORT: 3000
+      REDIS_URL: redis://redis:6379
+      SHARE_TTL_SECONDS: 2592000
+      RATE_LIMIT_MAX: 30
+      RATE_LIMIT_WINDOW_MS: 3600000
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  redis-data:
