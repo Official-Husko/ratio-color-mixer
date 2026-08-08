@@ -79,8 +79,3 @@ server/
   src/           # the Share Link backend: a plain node:http server, Redis-backed
                   # storage with a sliding TTL, payload validation, per-IP rate limiting
 ```
-
-Two reference-only directories live alongside `src/` and aren't part of the shipped app:
-
-- `mockup/`: the original design mockup (a design-tool export, not runnable source) that the UI was built to match
-- `digitpaints_color_math_study/`: a documented study of the underlying paint-mixing math (RYB approximation + simplex-projected gradient descent). `src/lib/color-math.ts` is a **fresh, independent implementation** of the same published technique; see that folder's `NOTICE.md` for why it isn't a port of that code.
