@@ -30,7 +30,7 @@ export function App() {
         >
           {shareCodeStatus === 'loading'
             ? 'Loading shared palette…'
-            : "This share link has expired or no longer exists — showing your last palette instead."}
+            : "This share link has expired or no longer exists, so we're showing your last palette instead."}
         </div>
       )}
 
@@ -50,7 +50,7 @@ export function App() {
           />
           <TargetColorCard
             target={target}
-            targetRgbLabel={viewModel.targetRgbLabel}
+            targetRgb={viewModel.targetRgb}
             image={image}
             onTargetChange={actions.setTarget}
             onImageUpload={actions.uploadImage}

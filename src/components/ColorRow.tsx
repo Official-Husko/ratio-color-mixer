@@ -1,5 +1,6 @@
 import type { TargetedEvent } from 'preact'
 import type { ColorItem } from '../types'
+import { MAX_COLOR_NAME_LENGTH } from '../lib/sanitize'
 import { Swatch } from './ui/Swatch'
 import { Icon } from './ui/Icon'
 
@@ -35,6 +36,7 @@ export function ColorRow({ color, fallbackName, onHexChange, onNameChange, onRem
             value={color.name}
             onInput={(e: TargetedEvent<HTMLInputElement>) => onNameChange(e.currentTarget.value)}
             placeholder={fallbackName}
+            maxLength={MAX_COLOR_NAME_LENGTH}
             // Sized to the placeholder text itself (rather than flex:1 filling
             // the row) so the muted hint can sit right after it instead of
             // being pushed off to the far edge of an otherwise-empty input.
@@ -69,6 +71,7 @@ export function ColorRow({ color, fallbackName, onHexChange, onNameChange, onRem
           type="text"
           value={color.hex}
           onInput={(e: TargetedEvent<HTMLInputElement>) => onHexChange(e.currentTarget.value)}
+          maxLength={7}
           style={{
             border: 'none',
             outline: 'none',

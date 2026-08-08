@@ -1,6 +1,10 @@
 const HEX_RE = /^#[0-9a-fA-F]{6}$/
 const MAX_COLORS = 100
-const MAX_NAME_LENGTH = 60
+// Mirrors src/lib/sanitize.ts's client-side name rules — the client already
+// filters as-you-type, but the server must not trust that a request actually
+// came from this client, so it re-enforces the same charset/length here.
+const MAX_NAME_LENGTH = 32
+const NAME_RE = /^[a-zA-Z0-9 '&().,-]*$/
 const MAX_BODY_BYTES = 10_000
 const UNIT_MODES = new Set(['percentage', 'ml'])
 const VOLUME_UNITS = new Set(['ml', 'l', 'us_fl_oz', 'us_pint', 'us_quart', 'us_gallon'])
@@ -31,7 +35,7 @@ export function validatePayload(value: unknown): value is SharePayload {
     if (!c || typeof c !== 'object') return false
     const color = c as Record<string, unknown>
     if (typeof color.hex !== 'string' || !HEX_RE.test(color.hex)) return false
-    if (typeof color.name !== 'string' || color.name.length > MAX_NAME_LENGTH) return false
+    if (typeof color.name !== 'string' || color.name.length > MAX_NAME_LENGTH || !NAME_RE.test(color.name)) return false
     return true
   })
 }

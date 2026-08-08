@@ -9,7 +9,7 @@ export function RecipeList({ items }: RecipeListProps) {
 
   return (
     <div>
-      <div style={{ fontWeight: 600, fontSize: 13.5, margin: '20px 0 10px' }}>Recipe</div>
+      <h3 style={{ fontWeight: 600, fontSize: 13.5, margin: '20px 0 10px' }}>Recipe</h3>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
         {items.map((step) => (
           <div key={step.stepNumber} style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>

@@ -44,7 +44,7 @@ export interface ViewModel {
   hasEnoughColors: boolean
   canSimplify: boolean
   mixedHex: string
-  targetRgbLabel: string
+  targetRgb: { r: number; g: number; b: number }
   match: number
   matchBadge: MatchBadge
   colors: MixColorRow[]

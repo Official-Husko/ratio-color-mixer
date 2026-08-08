@@ -41,7 +41,7 @@ export function EstimatedMixCard({
   return (
     <div style={{ ...card, padding: 26, position: 'sticky', top: 32 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-        <div style={{ fontWeight: 600, fontSize: 15 }}>Estimated mix</div>
+        <h2 style={{ fontWeight: 600, fontSize: 15, margin: 0 }}>Estimated mix</h2>
         {vm.hasEnoughColors && (
           <div
             class="match-badge"
@@ -99,7 +99,7 @@ export function EstimatedMixCard({
           />
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-            <div style={{ fontWeight: 600, fontSize: 13.5 }}>Mix ratio</div>
+            <h3 style={{ fontWeight: 600, fontSize: 13.5, margin: 0 }}>Mix ratio</h3>
             <div style={segmentedTrack}>
               <button
                 type="button"
@@ -159,7 +159,7 @@ export function EstimatedMixCard({
           <RecipeList items={vm.recipeItems} />
 
           <div style={{ fontSize: 12, color: 'var(--text-muted-2)', marginTop: 16, lineHeight: 1.5 }}>
-            Estimate based on simple color blending — actual mixing results depend on the pigments or materials used.
+            Estimate based on simple color blending. Actual mixing results depend on the pigments or materials used.
           </div>
 
           <ActionButtons

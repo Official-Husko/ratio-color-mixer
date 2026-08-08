@@ -5,7 +5,7 @@ import { ImageSampler } from './ImageSampler'
 
 interface TargetColorCardProps {
   target: string
-  targetRgbLabel: string
+  targetRgb: { r: number; g: number; b: number }
   image: string | null
   onTargetChange: (hex: string) => void
   onImageUpload: (file: File) => void
@@ -15,16 +15,21 @@ interface TargetColorCardProps {
 
 export function TargetColorCard({
   target,
-  targetRgbLabel,
+  targetRgb,
   image,
   onTargetChange,
   onImageUpload,
   onImageSample,
   onImageRemove,
 }: TargetColorCardProps) {
+  const channels: Array<{ label: string; value: number; color: string }> = [
+    { label: 'R', value: targetRgb.r, color: `rgb(${targetRgb.r},0,0)` },
+    { label: 'G', value: targetRgb.g, color: `rgb(0,${targetRgb.g},0)` },
+    { label: 'B', value: targetRgb.b, color: `rgb(0,0,${targetRgb.b})` },
+  ]
   return (
     <div style={card}>
-      <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 16 }}>Target color</div>
+      <h2 style={{ fontWeight: 600, fontSize: 15, margin: '0 0 16px' }}>Target color</h2>
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 18 }}>
         <Swatch hex={target} size={64} radius={16} editable onChange={onTargetChange} />
         <div style={{ flex: 1 }}>
@@ -43,6 +48,7 @@ export function TargetColorCard({
             type="text"
             value={target}
             onInput={(e: TargetedEvent<HTMLInputElement>) => onTargetChange(e.currentTarget.value)}
+            maxLength={7}
             style={{
               border: 'none',
               outline: 'none',
@@ -56,8 +62,24 @@ export function TargetColorCard({
               color: 'var(--text)',
             }}
           />
-          <div style={{ fontFamily: 'var(--mono)', fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4 }}>
-            {targetRgbLabel}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
+            {channels.map(({ label, value, color }) => (
+              <div key={label} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                <span
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: 2,
+                    background: color,
+                    border: '1px solid var(--border-input)',
+                    flex: 'none',
+                  }}
+                />
+                <span style={{ fontFamily: 'var(--mono)', fontSize: 11.5, color: 'var(--text-muted)' }}>
+                  {label} {value}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

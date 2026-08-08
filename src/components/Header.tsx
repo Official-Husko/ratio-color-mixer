@@ -7,9 +7,9 @@ export function Header() {
       </div>
 
       <div style={{ marginBottom: 40, maxWidth: 640 }}>
-        <div style={{ fontWeight: 700, fontSize: 38, lineHeight: 1.15, letterSpacing: '-0.01em', margin: '0 0 10px' }}>
+        <h1 style={{ fontWeight: 700, fontSize: 38, lineHeight: 1.15, letterSpacing: '-0.01em', margin: '0 0 10px' }}>
           Mix your way to any color
-        </div>
+        </h1>
         <div style={{ fontSize: 16, lineHeight: 1.5, color: 'var(--text-secondary)', margin: 0 }}>
           Add the colors you have on hand, set a target, and see the ratio to blend.
         </div>

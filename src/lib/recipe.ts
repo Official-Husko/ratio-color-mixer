@@ -131,7 +131,7 @@ export function buildViewModel(
     hasEnoughColors: colors.length >= 2,
     canSimplify: colors.length > 2,
     mixedHex: colors.length ? rgbToHex(mixedRgb) : '#ffffff',
-    targetRgbLabel: `R ${targetRgb.r} · G ${targetRgb.g} · B ${targetRgb.b}`,
+    targetRgb,
     match,
     matchBadge: matchBadgeFor(match),
     colors: rows,

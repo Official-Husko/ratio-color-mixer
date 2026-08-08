@@ -8,7 +8,7 @@ interface PresetsCardProps {
 export function PresetsCard({ onAdd }: PresetsCardProps) {
   return (
     <div style={card}>
-      <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 14 }}>Presets</div>
+      <h2 style={{ fontWeight: 600, fontSize: 15, margin: '0 0 14px' }}>Presets</h2>
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
         {PRESETS.map((preset) => (
           <button

@@ -18,7 +18,7 @@ export function Footer() {
         <Icon name="lock" style={{ color: 'var(--text-muted)' }} />
         <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-            100% client-side — nothing you enter is ever sent to a server.*
+            100% client-side: nothing you enter is ever sent to a server.*
           </span>
           <span style={{ fontSize: 8, color: 'var(--text-faint)' }}>
             *The only exception is Share Link, which stores that one palette on our server for 30 days.{' '}

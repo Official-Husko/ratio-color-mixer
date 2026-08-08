@@ -7,6 +7,7 @@ import { loadState, saveState } from '../lib/storage'
 import { naturalCoordsFromClick, readFileAsDataUrl, sampleImagePixel } from '../lib/image-sample'
 import { buildRecipeImageCanvas, downloadCanvasAsPng } from '../lib/image-export'
 import { generateId } from '../lib/id'
+import { sanitizeColorName, sanitizeHexInput } from '../lib/sanitize'
 import { isVolumeUnit, type VolumeUnit } from '../lib/units'
 import {
   DEFAULT_COLORS,
@@ -189,11 +190,13 @@ export function useMixerState() {
   }
 
   function updateColorHex(id: string, hex: string) {
-    setColors((prev) => prev.map((c) => (c.id === id ? { ...c, hex } : c)))
+    const clean = sanitizeHexInput(hex)
+    setColors((prev) => prev.map((c) => (c.id === id ? { ...c, hex: clean } : c)))
   }
 
   function updateColorName(id: string, name: string) {
-    setColors((prev) => prev.map((c) => (c.id === id ? { ...c, name } : c)))
+    const clean = sanitizeColorName(name)
+    setColors((prev) => prev.map((c) => (c.id === id ? { ...c, name: clean } : c)))
   }
 
   async function uploadImage(file: File) {
@@ -207,6 +210,13 @@ export function useMixerState() {
 
   function removeImage() {
     setImage(null)
+  }
+
+  // Wraps the raw setTarget setter for the free-text hex field specifically —
+  // sampleImageAt above calls setTarget directly with an already-trusted
+  // value computed from actual pixel data, so it doesn't need this.
+  function setTargetHex(hex: string) {
+    setTarget(sanitizeHexInput(hex))
   }
 
   function simplifyMix() {
@@ -285,7 +295,7 @@ export function useMixerState() {
       clearAllColors,
       updateColorHex,
       updateColorName,
-      setTarget,
+      setTarget: setTargetHex,
       uploadImage,
       sampleImageAt,
       removeImage,

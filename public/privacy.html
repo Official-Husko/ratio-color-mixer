@@ -3,9 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#141414" />
-    <title>Privacy — Ratio</title>
+    <title>Privacy: Ratio</title>
     <meta
       name="description"
       content="What Ratio stores and what stays on your device, including the Share Link feature's 30-day server-side palette storage."
@@ -18,7 +20,6 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/fontawesome/css/fontawesome.css" />
-    <link rel="stylesheet" href="/fontawesome/css/solid.css" />
     <style>
       :root {
         --bg: #141414;
@@ -147,7 +148,7 @@
           <li>the batch size and unit you had selected</li>
         </ul>
         <p>
-          That's it — no account, no email, no browsing history, nothing tied to who you are. It's kept for 30 days
+          That's it: no account, no email, no browsing history, nothing tied to who you are. It's kept for 30 days
           from the last time anyone opens the link (each visit resets that clock), then it's automatically deleted.
           Anyone with the link can view and copy it into their own editable palette; nothing about your original
           session changes when they do.
@@ -171,7 +172,7 @@
       <section>
         <h2><i class="fa-solid fa-code" aria-hidden="true"></i>Verify it yourself</h2>
         <p>
-          Ratio is open source — don't just take this page's word for it. The frontend
+          Ratio is open source, so don't just take this page's word for it. The frontend
           (<code>src/lib/share-link.ts</code>) and the Share Link backend (<code>server/</code>) are both in the
           repo, so you can read exactly what gets sent and stored:
           <a href="https://github.com/Official-Husko/ratio-color-mixer" target="_blank" rel="noreferrer">

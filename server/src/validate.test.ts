@@ -42,7 +42,14 @@ describe('validatePayload', () => {
 
   it('rejects a color with a bad hex or an over-long name', () => {
     expect(validatePayload({ ...validPayload(), colors: [{ hex: 'red', name: 'x' }] })).toBe(false)
-    expect(validatePayload({ ...validPayload(), colors: [{ hex: '#ff0000', name: 'x'.repeat(61) }] })).toBe(false)
+    expect(validatePayload({ ...validPayload(), colors: [{ hex: '#ff0000', name: 'x'.repeat(33) }] })).toBe(false)
+  })
+
+  it('accepts names with common paint-name punctuation, rejects markup-like characters', () => {
+    expect(validatePayload({ ...validPayload(), colors: [{ hex: '#ff0000', name: "Payne's Grey (Cool), No. 2" }] })).toBe(true)
+    for (const bad of ['<script>', 'a"b', "a'; DROP TABLE--", 'a`b', 'a{b}', 'a/b', 'a\\b']) {
+      expect(validatePayload({ ...validPayload(), colors: [{ hex: '#ff0000', name: bad }] })).toBe(false)
+    }
   })
 
   it('rejects non-object input', () => {

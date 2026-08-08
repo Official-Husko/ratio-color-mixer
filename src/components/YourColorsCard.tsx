@@ -43,7 +43,7 @@ export function YourColorsCard({
   return (
     <div style={card}>
       <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 16 }}>
-        <div style={{ fontWeight: 600, fontSize: 15 }}>Your colors</div>
+        <h2 style={{ fontWeight: 600, fontSize: 15, margin: 0 }}>Your colors</h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {canSimplify && (
             <button
