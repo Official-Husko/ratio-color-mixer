@@ -98,10 +98,11 @@ export function YourColorsCard({
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
-        {colors.map((color) => (
+        {colors.map((color, index) => (
           <ColorRow
             key={color.id}
             color={color}
+            fallbackName={`Color ${index + 1}`}
             onHexChange={(hex) => onUpdateHex(color.id, hex)}
             onNameChange={(name) => onUpdateName(color.id, name)}
             onRemove={() => onRemove(color.id)}

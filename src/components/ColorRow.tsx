@@ -5,12 +5,14 @@ import { Icon } from './ui/Icon'
 
 interface ColorRowProps {
   color: ColorItem
+  /** Shown as the name field's placeholder — matches the "Color N" fallback used elsewhere once a color is left unnamed, so the two labels are recognizably the same row. */
+  fallbackName: string
   onHexChange: (hex: string) => void
   onNameChange: (name: string) => void
   onRemove: () => void
 }
 
-export function ColorRow({ color, onHexChange, onNameChange, onRemove }: ColorRowProps) {
+export function ColorRow({ color, fallbackName, onHexChange, onNameChange, onRemove }: ColorRowProps) {
   return (
     <div
       class="color-row"
@@ -29,7 +31,7 @@ export function ColorRow({ color, onHexChange, onNameChange, onRemove }: ColorRo
           type="text"
           value={color.name}
           onInput={(e: JSX.TargetedEvent<HTMLInputElement>) => onNameChange(e.currentTarget.value)}
-          placeholder="Name this color"
+          placeholder={fallbackName}
           style={{
             border: 'none',
             outline: 'none',
