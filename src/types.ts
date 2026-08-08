@@ -2,7 +2,8 @@ import type { VolumeUnit } from './lib/units'
 
 export type UnitMode = 'percentage' | 'ml'
 export type SortMode = 'added' | 'percent-desc'
-export type FeedbackKind = 'recipe' | 'link' | 'image' | null
+export type FeedbackKind = 'recipe' | 'link' | 'link-error' | 'image' | null
+export type ShareCodeStatus = 'loading' | 'error' | null
 
 export interface ColorItem {
   id: string

@@ -4,25 +4,27 @@ import { Icon } from './ui/Icon'
 
 interface ActionButtonsProps {
   feedback: FeedbackKind
+  isSharing: boolean
   onCopyRecipe: () => void
   onDownloadImage: () => void
   onShare: () => void
 }
 
-function buttonStyle(active: boolean) {
+function buttonStyle(active: boolean, error = false) {
   return {
     ...pillButton,
-    color: active ? 'var(--accent)' : '#b0b0b0',
+    color: error ? '#e0817d' : active ? 'var(--accent)' : '#b0b0b0',
     display: 'inline-flex',
     alignItems: 'center',
     gap: 8,
   }
 }
 
-export function ActionButtons({ feedback, onCopyRecipe, onDownloadImage, onShare }: ActionButtonsProps) {
+export function ActionButtons({ feedback, isSharing, onCopyRecipe, onDownloadImage, onShare }: ActionButtonsProps) {
   const recipeActive = feedback === 'recipe'
   const imageActive = feedback === 'image'
   const linkActive = feedback === 'link'
+  const linkError = feedback === 'link-error'
 
   return (
     <div style={{ display: 'flex', gap: 10, marginTop: 20, flexWrap: 'wrap' }}>
@@ -47,11 +49,12 @@ export function ActionButtons({ feedback, onCopyRecipe, onDownloadImage, onShare
       <button
         type="button"
         onClick={onShare}
+        disabled={isSharing}
         class={`action-btn${linkActive ? ' feedback-pop' : ''}`}
-        style={buttonStyle(linkActive)}
+        style={buttonStyle(linkActive, linkError)}
       >
-        <Icon name={linkActive ? 'check' : 'share-nodes'} />
-        {linkActive ? 'Link copied' : 'Share'}
+        <Icon name={linkError ? 'triangle-exclamation' : linkActive ? 'check' : 'share-nodes'} />
+        {isSharing ? 'Sharing…' : linkError ? "Couldn't share" : linkActive ? 'Link copied' : 'Share'}
       </button>
     </div>
   )

@@ -1,23 +1,23 @@
 # Ratio — paint color mixer
 
-A client-side calculator for artists and hobbyists: add the paints you have on hand, set a target color (by hex or by sampling a photo), and get back an estimated mixing ratio — as percentages, whole-number "parts," or milliliters for a batch size you choose.
+A client-side calculator for artists and hobbyists: add the paints you have on hand, set a target color (by hex or by sampling a photo), and get back an estimated mixing ratio — as percentages or as a volume (ml, L, or US fl oz/pint/quart/gallon) for a batch size you choose.
 
-Everything runs in the browser. There is no backend — nothing you enter is ever sent to a server. Sharing a palette works by encoding it into a URL query param that the recipient's browser decodes into their own independent, editable copy.
+The app itself runs entirely in the browser and persists your work locally (`localStorage`) — the one exception is the optional Share Link action: it stores that single palette on a small backend for 30 days (sliding — it resets on every visit) behind a short code, so anyone with the link can open their own independent, editable copy without your original changing. See `public/privacy.html` (linked from the footer) for the plain-language rundown of what that stores.
 
 ## Features
 
 - Add colors from presets, a native color picker, or by sampling a pixel from an uploaded image
 - Solves for the mix ratio that best reproduces a target color, using a painter-oriented (RYB-approximated) mixing model rather than a naive RGB average
-- Batch size in ml, with a %/ml toggle and whole-number "parts" for easy real-world measuring
-- Copy the recipe as text, download it as a PNG, or share a link that opens a fresh, independently-editable copy for whoever opens it
+- Batch size in your choice of volume unit, with a %/volume toggle
+- Copy the recipe as text, download it as a PNG, or share a short link that opens a fresh, independently-editable copy for whoever opens it
 - Everything persists locally (`localStorage`) between visits
 
 ## Tech stack
 
 - [Preact](https://preactjs.com/) + TypeScript, built with [Vite](https://vite.dev/)
-- [Vitest](https://vitest.dev/) for the color-math test suite
+- [Vitest](https://vitest.dev/) for the test suite (frontend and the share API)
 - [Oxlint](https://oxc.rs/) for linting
-- No backend, no database, no external API calls
+- `server/` — a small Node HTTP service backing Share Link, storing palettes in Redis with a 30-day sliding TTL. Everything else about the app has no backend, no database, and no external API calls.
 
 ## Getting started
 
@@ -27,35 +27,53 @@ npm run dev       # start the dev server
 npm run build     # type-check and produce a production build in dist/
 npm run preview   # serve the production build locally
 npm run lint       # oxlint
-npm run test       # vitest — color-math numeric parity tests
+npm run test       # vitest — color-math numeric parity + share-link tests
+```
+
+The frontend alone is fully usable without the share API — every feature works except creating/opening a Share Link (`npm run dev` proxies `/api/*` to `http://localhost:3000`, so start the API too if you want to exercise that: see below).
+
+### Running the share API locally
+
+`server/` is a separate npm package. It needs a Redis instance:
+
+```sh
+docker run --rm -p 6379:6379 redis:7-alpine
+cd server
+npm install
+npm run build && npm start   # listens on :3000
 ```
 
 ## Running with Docker
 
-A multi-stage `Dockerfile` builds the app and serves the static output with nginx.
+`docker compose up --build` builds and runs the full stack: the frontend (multi-stage `Dockerfile`, served by nginx), the share API (`server/Dockerfile`), and Redis — nginx reverse-proxies `/api/` to the API service so the frontend never needs CORS.
 
 ```sh
 docker compose up --build
 ```
 
-The site is then available at [http://localhost:8080](http://localhost:8080). To build/run the image directly instead of via Compose:
+The site is then available at [http://localhost:8080](http://localhost:8080). To build/run the frontend image directly instead of via Compose (note this alone won't have a working Share Link, since it needs the `api`/`redis` services too):
 
 ```sh
 docker build -t ratio-color-mixer .
 docker run --rm -p 8080:80 ratio-color-mixer
 ```
 
-A GitHub Actions workflow (`.github/workflows/docker.yml`) lints, tests, and builds the app on every push and pull request, and publishes the image to `ghcr.io/<owner>/<repo>` on pushes to `main` (tagged `latest`) and on version tags (`v1.2.3`).
+The `api` service reads `REDIS_URL`, `SHARE_TTL_SECONDS` (default 2592000 = 30 days), `RATE_LIMIT_MAX`, and `RATE_LIMIT_WINDOW_MS` from the environment — see `docker-compose.yml` for the defaults.
+
+A GitHub Actions workflow (`.github/workflows/docker.yml`) lints, tests, and builds both the app and the share API on every push and pull request, and publishes both images (`ghcr.io/<owner>/<repo>` and `ghcr.io/<owner>/<repo>-api`) on pushes to `main` (tagged `latest`) and on version tags (`v1.2.3`).
 
 ## Project structure
 
 ```text
 src/
   lib/           # pure TS: color math solver, ratio/recipe formatting, share-link
-                  # encode/decode, localStorage persistence, clipboard, image export/sampling
+                  # encode/decode + API calls, localStorage persistence, clipboard, image export/sampling
   hooks/         # useMixerState — the app's single stateful hook
   components/    # Preact UI components
   css/           # Font Awesome (icon font used throughout the UI)
+server/
+  src/           # the Share Link backend: a plain node:http server, Redis-backed
+                  # storage with a sliding TTL, payload validation, per-IP rate limiting
 ```
 
 Two reference-only directories live alongside `src/` and aren't part of the shipped app:

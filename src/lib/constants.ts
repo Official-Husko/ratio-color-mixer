@@ -36,5 +36,6 @@ export const FEEDBACK_DURATION_MS = 1600
 export const PERSIST_DEBOUNCE_MS = 300
 export const STORAGE_KEY = 'ratio:mixer-state:v1'
 export const SHARE_PARAM = 's'
+export const SHARE_CODE_PARAM = 'c'
 
 export const GITHUB_URL = 'https://github.com/Official-Husko/ratio-color-mixer'

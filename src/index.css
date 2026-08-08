@@ -189,6 +189,14 @@ button:not(:disabled):active {
   transform: translateY(-1px);
 }
 
+.footer-text-link {
+  transition: color 0.15s ease;
+}
+
+.footer-text-link:hover {
+  color: var(--accent) !important;
+}
+
 input[type='range'] {
   cursor: pointer;
 }

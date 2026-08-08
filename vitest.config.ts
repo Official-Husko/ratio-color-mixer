@@ -10,6 +10,8 @@ export default defineConfig({
     // digitpaints_color_math_study/ ships its own node:test-based suite
     // (run separately via `npm test` inside that folder) — not compatible
     // with Vitest's collector, and not part of this app's test surface.
-    exclude: ['**/node_modules/**', 'digitpaints_color_math_study/**'],
+    // server/ is a separate npm package with its own vitest run (`npm test`
+    // inside server/) — excluded here so it isn't collected twice.
+    exclude: ['**/node_modules/**', 'digitpaints_color_math_study/**', 'server/**'],
   },
 })

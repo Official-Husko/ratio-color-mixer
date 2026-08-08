@@ -5,8 +5,42 @@ services:
     ports:
       - "8080:80"
     restart: unless-stopped
+    depends_on:
+      - api
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
       interval: 30s
       timeout: 3s
       retries: 3
+
+  api:
+    build: ./server
+    image: ratio-color-mixer-api:local
+    restart: unless-stopped
+    depends_on:
+      - redis
+    environment:
+      PORT: 3000
+      REDIS_URL: redis://redis:6379
+      SHARE_TTL_SECONDS: 2592000
+      RATE_LIMIT_MAX: 30
+      RATE_LIMIT_WINDOW_MS: 3600000
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  redis-data:

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
 import { solvePaintMixHex } from '../lib/solve-paint-mix'
 import { buildViewModel, pickSimplifiedColors } from '../lib/recipe'
 import { copyText } from '../lib/clipboard'
-import { buildShareUrl, decodeShareState } from '../lib/share-link'
+import { buildShareCodeUrl, createShareCode, decodeShareState, fetchSharedPayload, getShareCodeFromUrl } from '../lib/share-link'
 import { loadState, saveState } from '../lib/storage'
 import { naturalCoordsFromClick, readFileAsDataUrl, sampleImagePixel } from '../lib/image-sample'
 import { buildRecipeImageCanvas, downloadCanvasAsPng } from '../lib/image-export'
@@ -15,9 +15,10 @@ import {
   DEFAULT_VOLUME_UNIT,
   FEEDBACK_DURATION_MS,
   PERSIST_DEBOUNCE_MS,
+  SHARE_CODE_PARAM,
   SHARE_PARAM,
 } from '../lib/constants'
-import type { ColorItem, FeedbackKind, SharePayload, UnitMode } from '../types'
+import type { ColorItem, FeedbackKind, ShareCodeStatus, SharePayload, UnitMode } from '../types'
 
 function withId(color: { hex: string; name: string }): ColorItem {
   return { id: generateId(), hex: color.hex, name: color.name }
@@ -77,6 +78,10 @@ export function useMixerState() {
   const [unitMode, setUnitMode] = useState<UnitMode>(initial.unitMode)
   const [volumeUnit, setVolumeUnit] = useState<VolumeUnit>(initial.volumeUnit)
   const [feedback, setFeedback] = useState<FeedbackKind>(null)
+  const [isSharing, setIsSharing] = useState(false)
+  const [shareCodeStatus, setShareCodeStatus] = useState<ShareCodeStatus>(
+    typeof location !== 'undefined' && getShareCodeFromUrl(location.search) ? 'loading' : null,
+  )
 
   const feedbackTimer = useRef<ReturnType<typeof setTimeout>>()
   const persistTimer = useRef<ReturnType<typeof setTimeout>>()
@@ -91,7 +96,41 @@ export function useMixerState() {
     // call, so this only needs to run once, right after mount.
   }, [initial.fromShareLink])
 
+  // A `?c=` short code needs a network round-trip, so it can't be resolved
+  // synchronously inside resolveInitialState() like the legacy `?s=` link —
+  // the app renders with localStorage/defaults first, then this swaps in the
+  // fetched palette (or reports failure) once the request settles.
   useEffect(() => {
+    const id = getShareCodeFromUrl(location.search)
+    if (!id) return
+
+    let cancelled = false
+    fetchSharedPayload(id).then((payload) => {
+      if (cancelled) return
+      if (payload) {
+        setColors(payload.colors.map(withId))
+        setTarget(payload.target)
+        setTotalMl(payload.totalMl)
+        setUnitMode(payload.unitMode)
+        setVolumeUnit(payload.volumeUnit)
+        setShareCodeStatus(null)
+      } else {
+        setShareCodeStatus('error')
+      }
+      const params = new URLSearchParams(location.search)
+      params.delete(SHARE_CODE_PARAM)
+      const query = params.toString()
+      history.replaceState(null, '', location.pathname + (query ? `?${query}` : ''))
+    })
+
+    return () => {
+      cancelled = true
+    }
+    // Only ever reads the `?c=` param present on first mount.
+  }, [])
+
+  useEffect(() => {
+    if (shareCodeStatus === 'loading') return // avoid saving the pre-fetch placeholder state over it
     clearTimeout(persistTimer.current)
     persistTimer.current = setTimeout(() => {
       const payload: SharePayload = {
@@ -105,7 +144,7 @@ export function useMixerState() {
       saveState(payload)
     }, PERSIST_DEBOUNCE_MS)
     return () => clearTimeout(persistTimer.current)
-  }, [colors, target, totalMl, unitMode, volumeUnit])
+  }, [colors, target, totalMl, unitMode, volumeUnit, shareCodeStatus])
 
   useEffect(() => () => clearTimeout(feedbackTimer.current), [])
 
@@ -212,7 +251,20 @@ export function useMixerState() {
       volumeUnit,
       colors: colors.map((c) => ({ hex: c.hex, name: c.name })),
     }
-    if (await copyText(buildShareUrl(payload))) flashFeedback('link')
+
+    setIsSharing(true)
+    try {
+      const id = await createShareCode(payload)
+      if (await copyText(buildShareCodeUrl(id))) {
+        flashFeedback('link')
+      } else {
+        flashFeedback('link-error')
+      }
+    } catch {
+      flashFeedback('link-error')
+    } finally {
+      setIsSharing(false)
+    }
   }
 
   return {
@@ -223,6 +275,8 @@ export function useMixerState() {
     unitMode,
     volumeUnit,
     feedback,
+    isSharing,
+    shareCodeStatus,
     viewModel,
     actions: {
       addPreset,

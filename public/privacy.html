@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Privacy — Ratio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/fontawesome/css/fontawesome.css" />
+    <link rel="stylesheet" href="/fontawesome/css/solid.css" />
+    <style>
+      :root {
+        --bg: #141414;
+        --card-bg: #1c1c1c;
+        --card-border: #2a2a2a;
+        --text: #f2f2f2;
+        --text-secondary: #9a9a9a;
+        --text-muted: #7a7a7a;
+        --divider: #2a2a2a;
+        --accent: #7de0c9;
+        --sans: 'Space Grotesk', system-ui, sans-serif;
+        --mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+        color-scheme: dark;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--sans);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      main {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 56px 24px 80px;
+      }
+
+      a {
+        color: var(--accent);
+      }
+
+      h1 {
+        font-size: 28px;
+        margin-bottom: 8px;
+      }
+
+      .lede {
+        color: var(--text-secondary);
+        font-size: 14px;
+        margin-bottom: 40px;
+      }
+
+      section {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 14px;
+        padding: 22px 24px;
+        margin-bottom: 16px;
+      }
+
+      h2 {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 15px;
+        margin: 0 0 10px;
+      }
+
+      h2 .fa-solid {
+        font-size: 13px;
+        color: var(--accent);
+      }
+
+      .lede .fa-solid {
+        color: var(--text-secondary);
+        margin-right: 4px;
+      }
+
+      p,
+      li {
+        font-size: 13.5px;
+        line-height: 1.6;
+        color: var(--text-secondary);
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      code {
+        font-family: var(--mono);
+        font-size: 0.92em;
+        color: var(--text);
+      }
+
+      .back {
+        display: inline-block;
+        margin-bottom: 28px;
+        font-size: 13px;
+        color: var(--text-muted);
+        text-decoration: none;
+      }
+
+      .back:hover {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a class="back" href="/">← Back to Ratio</a>
+      <h1>Privacy</h1>
+      <p class="lede"><i class="fa-solid fa-lock" aria-hidden="true"></i>Short version: Ratio runs in your browser. The one exception is Share Link.</p>
+
+      <section>
+        <h2><i class="fa-solid fa-laptop" aria-hidden="true"></i>What stays on your device</h2>
+        <p>
+          Your colors, target, batch size, and everything else you enter is only ever kept in your browser's
+          <code>localStorage</code>, so it comes back the next time you open the app on that device. It's never sent
+          anywhere unless you click <strong>Share</strong>.
+        </p>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-share-nodes" aria-hidden="true"></i>What Share Link stores</h2>
+        <p>Clicking <strong>Share</strong> sends that one palette to our server, which stores:</p>
+        <ul>
+          <li>the target color and each paint's color and name (whatever you've typed into the name fields)</li>
+          <li>the batch size and unit you had selected</li>
+        </ul>
+        <p>
+          That's it — no account, no email, no browsing history, nothing tied to who you are. It's kept for 30 days
+          from the last time anyone opens the link (each visit resets that clock), then it's automatically deleted.
+          Anyone with the link can view and copy it into their own editable palette; nothing about your original
+          session changes when they do.
+        </p>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-network-wired" aria-hidden="true"></i>IP addresses</h2>
+        <p>
+          When you create a share link, your IP address is briefly used to prevent abuse (limiting how many links one
+          address can create per hour). It's held in memory for that check and is never written to storage or logged
+          alongside your palette data.
+        </p>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-eye-slash" aria-hidden="true"></i>No tracking</h2>
+        <p>No analytics, no cookies, no third-party scripts, no ads.</p>
+      </section>
+
+      <section>
+        <h2><i class="fa-solid fa-code" aria-hidden="true"></i>Verify it yourself</h2>
+        <p>
+          Ratio is open source — don't just take this page's word for it. The frontend
+          (<code>src/lib/share-link.ts</code>) and the Share Link backend (<code>server/</code>) are both in the
+          repo, so you can read exactly what gets sent and stored:
+          <a href="https://github.com/Official-Husko/ratio-color-mixer" target="_blank" rel="noreferrer">
+            github.com/Official-Husko/ratio-color-mixer
+          </a>
+          .
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

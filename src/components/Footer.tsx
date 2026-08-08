@@ -14,17 +14,19 @@ export function Footer() {
         borderTop: '1px solid var(--divider)',
       }}
     >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-          fontSize: 12,
-          color: 'var(--text-muted)',
-        }}
-      >
-        <Icon name="lock" />
-        100% client-side — nothing you enter is ever sent to a server.
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <Icon name="lock" style={{ color: 'var(--text-muted)' }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+            100% client-side — nothing you enter is ever sent to a server.*
+          </span>
+          <span style={{ fontSize: 8, color: 'var(--text-faint)' }}>
+            *The only exception is Share Link, which stores that one palette on our server for 30 days.{' '}
+            <a href="/privacy.html" class="footer-text-link" style={{ color: 'var(--text-muted)', textDecoration: 'underline' }}>
+              Privacy
+            </a>
+          </span>
+        </div>
       </div>
 
       {GITHUB_URL && (

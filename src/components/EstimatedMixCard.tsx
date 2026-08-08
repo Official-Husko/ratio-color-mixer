@@ -14,6 +14,7 @@ interface EstimatedMixCardProps {
   unitMode: UnitMode
   volumeUnit: VolumeUnit
   feedback: FeedbackKind
+  isSharing: boolean
   onVolumeChange: (ml: number) => void
   onSetUnitMode: (mode: UnitMode) => void
   onSetVolumeUnit: (unit: VolumeUnit) => void
@@ -29,6 +30,7 @@ export function EstimatedMixCard({
   unitMode,
   volumeUnit,
   feedback,
+  isSharing,
   onVolumeChange,
   onSetUnitMode,
   onSetVolumeUnit,
@@ -160,7 +162,13 @@ export function EstimatedMixCard({
             Estimate based on simple color blending — actual mixing results depend on the pigments or materials used.
           </div>
 
-          <ActionButtons feedback={feedback} onCopyRecipe={onCopyRecipe} onDownloadImage={onDownloadImage} onShare={onShare} />
+          <ActionButtons
+            feedback={feedback}
+            isSharing={isSharing}
+            onCopyRecipe={onCopyRecipe}
+            onDownloadImage={onDownloadImage}
+            onShare={onShare}
+          />
         </div>
       )}
     </div>
