@@ -1,0 +1,11 @@
+{
+  "name": "digitpaints-color-math-study",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Documented study implementation of a reverse paint-color mixing algorithm.",
+  "scripts": {
+    "test": "node --test",
+    "example": "node examples/basic.mjs"
+  }
+}

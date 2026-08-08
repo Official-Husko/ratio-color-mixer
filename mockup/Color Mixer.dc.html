@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0}
+input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+input[type=color]::-webkit-color-swatch{border:none}
+a{color:#7de0c9}
+a:hover{color:#9becd9}
+::placeholder{color:#5a5a5a}
+</style>
+</helmet>
+<div style="min-height:100vh;background:#141414;font-family:'Space Grotesk',system-ui,sans-serif;color:#f2f2f2">
+  <div style="max-width:1180px;margin:0 auto;padding:40px 48px 80px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:36px">
+      <div style="position:relative;width:28px;height:28px;flex:none">
+        <div style="position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;border:1.5px solid #3a3a3a"></div>
+        <div style="position:absolute;left:8px;top:0;width:20px;height:20px;border-radius:50%;background:#7de0c9"></div>
+      </div>
+      <div style="font-weight:700;font-size:19px;letter-spacing:-0.01em">Ratio</div>
+    </div>
+
+    <div style="margin-bottom:40px;max-width:640px">
+      <div style="font-weight:700;font-size:38px;line-height:1.15;letter-spacing:-0.01em;margin:0 0 10px">Mix your way to any color</div>
+      <div style="font-size:16px;line-height:1.5;color:#9a9a9a;margin:0">Add the colors you have on hand, set a target, and see the ratio to blend.</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:28px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:24px">
+
+        <div style="background:#1c1c1c;border:1px solid #2a2a2a;border-radius:20px;padding:22px">
+          <div style="font-weight:600;font-size:15px;margin-bottom:14px">Presets</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <sc-for list="{{ presets }}" as="preset" hint-placeholder-count="7">
+              <button onClick="{{ preset.onAdd }}" style="background:transparent;border:none;padding:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px">
+                <div style="width:32px;height:32px;border-radius:50%;background:{{ preset.hex }};border:1px solid #3a3a3a"></div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.04em;color:#7a7a7a;text-transform:uppercase">{{ preset.name }}</div>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="background:#1c1c1c;border:1px solid #2a2a2a;border-radius:20px;padding:22px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px">
+            <div style="font-weight:600;font-size:15px">Your colors</div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <sc-if value="{{ canSimplify }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ simplifyMix }}" style="border:none;background:transparent;color:#7de0c9;font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer;padding:0;text-decoration:underline">Simplify mix</button>
+              </sc-if>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#7a7a7a">{{ colorCountLabel }}</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+            <sc-for list="{{ colors }}" as="item" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:12px;padding:8px;border-radius:14px;background:#222222">
+                <div style="position:relative;width:38px;height:38px;border-radius:11px;overflow:hidden;border:1px solid #363636;background:{{ item.hex }};flex:none">
+                  <input type="color" value="{{ item.hex }}" onChange="{{ item.onHexChange }}" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:none;padding:0" />
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                  <input type="text" value="{{ item.name }}" onChange="{{ item.onNameChange }}" placeholder="Name this color" style="border:none;outline:none;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13.5px;background:transparent;padding:0;width:100%;color:#f2f2f2" />
+                  <input type="text" value="{{ item.hex }}" onChange="{{ item.onHexTextChange }}" style="border:none;outline:none;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8a8a8a;background:transparent;padding:0;width:100%;text-transform:uppercase" />
+                </div>
+                <button onClick="{{ item.onRemove }}" style="border:none;background:transparent;color:#7a7a7a;font-size:18px;line-height:1;cursor:pointer;padding:4px;flex:none">×</button>
+              </div>
+            </sc-for>
+          </div>
+          <button onClick="{{ addColor }}" disabled="{{ addDisabled }}" style="width:100%;padding:11px;border-radius:12px;border:1.5px dashed #3a3a3a;background:transparent;color:#7de0c9;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13.5px;cursor:pointer">{{ addButtonLabel }}</button>
+        </div>
+
+        <div style="background:#1c1c1c;border:1px solid #2a2a2a;border-radius:20px;padding:22px">
+          <div style="font-weight:600;font-size:15px;margin-bottom:16px">Target color</div>
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px">
+            <div style="position:relative;width:64px;height:64px;border-radius:16px;overflow:hidden;border:1px solid #363636;background:{{ target }};flex:none">
+              <input type="color" value="{{ target }}" onChange="{{ onTargetColorChange }}" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:none;padding:0" />
+            </div>
+            <div style="flex:1">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7a7a7a;letter-spacing:0.04em;margin-bottom:4px">HEX</div>
+              <input type="text" value="{{ target }}" onChange="{{ onTargetTextChange }}" style="border:none;outline:none;font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;background:transparent;padding:0;width:100%;text-transform:uppercase;color:#f2f2f2" />
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#7a7a7a;margin-top:4px">{{ targetRgbLabel }}</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+            <div style="flex:1;height:1px;background:#2a2a2a"></div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5a5a5a">OR</div>
+            <div style="flex:1;height:1px;background:#2a2a2a"></div>
+          </div>
+
+          <sc-if value="{{ noImage }}" hint-placeholder-val="{{ true }}">
+            <div style="position:relative;border:1.5px dashed #3a3a3a;border-radius:14px;padding:22px;text-align:center">
+              <div style="font-size:13px;color:#9a9a9a">Upload an image to sample a color from it</div>
+              <input type="file" accept="image/*" onChange="{{ onImageUpload }}" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%" />
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ hasImage }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <img src="{{ image }}" onClick="{{ onImageClick }}" style="width:100%;max-height:160px;object-fit:contain;border-radius:12px;border:1px solid #2a2a2a;cursor:crosshair;background:#0d0d0d" />
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+                <div style="font-size:12px;color:#7a7a7a">Click the image to sample a color</div>
+                <button onClick="{{ onImageRemove }}" style="border:none;background:transparent;color:#7a7a7a;font-size:12px;cursor:pointer;padding:0;text-decoration:underline">Remove</button>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+
+      <div style="background:#1c1c1c;border:1px solid #2a2a2a;border-radius:20px;padding:26px;position:sticky;top:32px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+          <div style="font-weight:600;font-size:15px">Estimated mix</div>
+          <sc-if value="{{ hasEnoughColors }}" hint-placeholder-val="{{ true }}">
+            <div style="font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:12.5px;padding:5px 12px;border-radius:999px;background:{{ matchBadgeBg }};color:{{ matchBadgeText }}">{{ match }}% match</div>
+          </sc-if>
+        </div>
+
+        <sc-if value="{{ hasEnoughColors }}" hint-placeholder-val="{{ true }}">
+          <div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:20px;padding:8px 0 24px">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+                <div style="width:96px;height:96px;border-radius:20px;background:{{ target }};border:1px solid #2a2a2a"></div>
+                <div style="font-size:12px;color:#7a7a7a">Target</div>
+              </div>
+              <div style="font-size:22px;color:#4a4a4a">→</div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+                <div style="width:96px;height:96px;border-radius:20px;background:{{ mixedHex }};border:1px solid #2a2a2a"></div>
+                <div style="font-size:12px;color:#7a7a7a">Your mix</div>
+              </div>
+            </div>
+
+            <div style="height:1px;background:#2a2a2a;margin-bottom:20px"></div>
+
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+              <div style="font-size:12.5px;color:#9a9a9a;flex:none">Batch size</div>
+              <input type="range" min="10" max="1000" step="10" value="{{ totalMl }}" onChange="{{ onVolumeChange }}" style="flex:1;accent-color:#7de0c9" />
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#f2f2f2;width:60px;text-align:right;flex:none">{{ totalMlLabel }}</div>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+              <div style="font-weight:600;font-size:13.5px">Mix ratio</div>
+              <div style="display:flex;background:#141414;border-radius:8px;padding:2px;gap:2px">
+                <button onClick="{{ setModePercent }}" style="padding:4px 10px;border-radius:6px;border:none;font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer;background:{{ percentBtnBg }};color:{{ percentBtnColor }}">%</button>
+                <button onClick="{{ setModeMl }}" style="padding:4px 10px;border-radius:6px;border:none;font-family:'IBM Plex Mono',monospace;font-size:11px;cursor:pointer;background:{{ mlBtnBg }};color:{{ mlBtnColor }}">ml</button>
+              </div>
+            </div>
+
+            <div style="display:flex;height:12px;border-radius:999px;overflow:hidden;margin-bottom:16px">
+              <sc-for list="{{ colors }}" as="item" hint-placeholder-count="3">
+                <div style="height:100%;background:{{ item.hex }};width:{{ item.percentWidth }}"></div>
+              </sc-for>
+            </div>
+
+            <div style="display:flex;flex-direction:column">
+              <sc-for list="{{ colors }}" as="item" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #262626">
+                  <div style="width:22px;height:22px;border-radius:7px;background:{{ item.hex }};flex:none;border:1px solid #363636"></div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-weight:600;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ item.displayName }}</div>
+                    <div style="font-size:11.5px;color:#7a7a7a;font-family:'IBM Plex Mono',monospace">{{ item.hexUpper }}</div>
+                  </div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:18px;flex:none">{{ item.displayValue }}</div>
+                </div>
+              </sc-for>
+            </div>
+
+            <sc-if value="{{ showRecipe }}" hint-placeholder-val="{{ true }}">
+              <div>
+                <div style="font-weight:600;font-size:13.5px;margin:20px 0 10px">Recipe</div>
+                <div style="display:flex;flex-direction:column;gap:9px">
+                  <sc-for list="{{ recipeItems }}" as="step" hint-placeholder-count="3">
+                    <div style="display:flex;align-items:flex-start;gap:10px">
+                      <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#7de0c9;width:16px;flex:none">{{ step.stepNumber }}</div>
+                      <div style="width:14px;height:14px;border-radius:4px;background:{{ step.hex }};flex:none;border:1px solid #363636"></div>
+                      <div style="font-size:13.5px;color:#d8d8d8">{{ step.recipeLine }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+
+            <div style="font-size:12px;color:#6a6a6a;margin-top:16px;line-height:1.5">Estimate based on simple color blending — actual mixing results depend on the pigments or materials used.</div>
+
+            <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
+              <button onClick="{{ copyRecipe }}" style="padding:9px 14px;border-radius:10px;border:1px solid #363636;background:transparent;color:{{ copyRecipeColor }};font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:12.5px;cursor:pointer">{{ copyRecipeLabel }}</button>
+              <button onClick="{{ downloadImage }}" style="padding:9px 14px;border-radius:10px;border:1px solid #363636;background:transparent;color:{{ downloadColor }};font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:12.5px;cursor:pointer">{{ downloadLabel }}</button>
+              <button onClick="{{ copyLink }}" style="padding:9px 14px;border-radius:10px;border:1px solid #363636;background:transparent;color:{{ copyLinkColor }};font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:12.5px;cursor:pointer">{{ copyLinkLabel }}</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ needsMoreColors }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:48px 20px;text-align:center;color:#7a7a7a">
+            <div style="font-weight:600;font-size:14px;color:#b0b0b0;margin-bottom:6px">Add at least 2 colors</div>
+            <div style="font-size:13px;line-height:1.5">Once you've added your colors, we'll estimate the ratio to reach your target.</div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: {&quot;width&quot;: 1400, &quot;height&quot;: 1000},
+  &quot;sortOrder&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;Order added&quot;, &quot;options&quot;: [&quot;Order added&quot;, &quot;Highest % first&quot;], &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Results&quot;},
+  &quot;showRecipe&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Results&quot;},
+  &quot;maxColors&quot;: {&quot;editor&quot;: &quot;range&quot;, &quot;default&quot;: 6, &quot;min&quot;: 2, &quot;max&quot;: 10, &quot;step&quot;: 1, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Behavior&quot;}
+}">
+class Component extends DCLogic {
+  idSeq = 4;
+  fbTimer = null;
+  state = {
+    colors: [
+      { id: 1, hex: '#1b3f8b', name: 'Ultramarine Blue' },
+      { id: 2, hex: '#f2c230', name: 'Cadmium Yellow' },
+      { id: 3, hex: '#f5f3ee', name: 'Titanium White' },
+    ],
+    target: '#9d9a84',
+    image: null,
+    feedback: null,
+    totalMl: 250,
+    unitMode: 'percentage',
+  };
+
+  hexToRgb(hex) {
+    const m = /^#?([0-9a-f]{6})$/i.exec((hex || '').trim());
+    if (!m) return [128, 128, 128];
+    const n = parseInt(m[1], 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+
+  rgbToHex(r, g, b) {
+    const c = (v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0');
+    return '#' + c(r) + c(g) + c(b);
+  }
+
+  gcd(a, b) {
+    a = Math.abs(a); b = Math.abs(b);
+    return b === 0 ? a : this.gcd(b, a % b);
+  }
+
+  simplifyRatio(weights) {
+    const scale = 12;
+    let scaled = weights.map((w) => (w > 0.02 ? Math.max(1, Math.round(w * scale)) : 0));
+    const positives = scaled.filter((x) => x > 0);
+    if (!positives.length) return scaled;
+    const g = positives.reduce((a, b) => this.gcd(a, b));
+    if (g > 1) scaled = scaled.map((x) => (x > 0 ? x / g : 0));
+    return scaled;
+  }
+
+  solveWeights(colorsRGB, targetRGB) {
+    const n = colorsRGB.length;
+    if (n === 0) return [];
+    if (n === 1) return [1];
+    let w = new Array(n).fill(1 / n);
+    const lr = 0.6;
+    for (let it = 0; it < 300; it++) {
+      const mixed = [0, 0, 0];
+      for (let i = 0; i < n; i++) for (let k = 0; k < 3; k++) mixed[k] += w[i] * colorsRGB[i][k];
+      const grad = new Array(n).fill(0);
+      for (let i = 0; i < n; i++) {
+        let g = 0;
+        for (let k = 0; k < 3; k++) g += (mixed[k] - targetRGB[k]) * colorsRGB[i][k];
+        grad[i] = g;
+      }
+      const scale = lr / (255 * 255);
+      for (let i = 0; i < n; i++) w[i] -= scale * grad[i];
+      for (let i = 0; i < n; i++) w[i] = Math.max(0, w[i]);
+      const s = w.reduce((a, b) => a + b, 0);
+      w = s > 0 ? w.map((x) => x / s) : new Array(n).fill(1 / n);
+    }
+    return w;
+  }
+
+  pushColor(hex, name) {
+    const max = this.props.maxColors ?? 6;
+    if (this.state.colors.length >= max) return;
+    const id = this.idSeq++;
+    this.setState((s) => ({ colors: [...s.colors, { id, hex, name: name || '' }] }));
+  }
+
+  addColor() {
+    const palette = ['#1b3f8b', '#f2c230', '#f5f3ee', '#c65d3b', '#5b8c5a', '#7a5c99', '#3e6b8a', '#b0b0b0'];
+    this.pushColor(palette[this.state.colors.length % palette.length], '');
+  }
+
+  addPreset(hex, name) {
+    const exists = this.state.colors.some((c) => c.hex.toLowerCase() === hex.toLowerCase());
+    if (exists) return;
+    this.pushColor(hex, name);
+  }
+
+  removeColor(id) {
+    this.setState((s) => ({ colors: s.colors.filter((c) => c.id !== id) }));
+  }
+
+  updateColorHex(id, hex) {
+    this.setState((s) => ({ colors: s.colors.map((c) => (c.id === id ? { ...c, hex } : c)) }));
+  }
+
+  updateColorName(id, name) {
+    this.setState((s) => ({ colors: s.colors.map((c) => (c.id === id ? { ...c, name } : c)) }));
+  }
+
+  updateTarget(hex) {
+    this.setState({ target: hex });
+  }
+
+  onImageUpload(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => this.setState({ image: reader.result });
+    reader.readAsDataURL(file);
+  }
+
+  onImageClick(e) {
+    const img = e.target;
+    const rect = img.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * img.naturalWidth;
+    const y = ((e.clientY - rect.top) / rect.height) * img.naturalHeight;
+    const canvas = document.createElement('canvas');
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    const data = ctx.getImageData(Math.max(0, Math.floor(x)), Math.max(0, Math.floor(y)), 1, 1).data;
+    this.updateTarget(this.rgbToHex(data[0], data[1], data[2]));
+  }
+
+  removeImage() {
+    this.setState({ image: null });
+  }
+
+  onVolumeChange(e) {
+    this.setState({ totalMl: parseInt(e.target.value, 10) });
+  }
+
+  setModePercent() {
+    this.setState({ unitMode: 'percentage' });
+  }
+
+  setModeMl() {
+    this.setState({ unitMode: 'ml' });
+  }
+
+  simplifyMix() {
+    const colorsRGB = this.state.colors.map((c) => this.hexToRgb(c.hex));
+    const targetRGB = this.hexToRgb(this.state.target);
+    const weights = this.solveWeights(colorsRGB, targetRGB);
+    const ranked = this.state.colors.map((c, i) => ({ c, w: weights[i] || 0 })).sort((a, b) => b.w - a.w);
+    let keep = ranked.filter((r) => r.w >= 0.05).map((r) => r.c);
+    if (keep.length < 2) keep = ranked.slice(0, 2).map((r) => r.c);
+    if (keep.length === this.state.colors.length) return;
+    this.setState({ colors: keep });
+  }
+
+  flashFeedback(kind) {
+    this.setState({ feedback: kind });
+    clearTimeout(this.fbTimer);
+    this.fbTimer = setTimeout(() => this.setState({ feedback: null }), 1600);
+  }
+
+  copyRecipe(recipeLines) {
+    const text = recipeLines.join('\n');
+    if (navigator.clipboard) navigator.clipboard.writeText(text).catch(() => {});
+    this.flashFeedback('recipe');
+  }
+
+  copyLink() {
+    const params = new URLSearchParams();
+    params.set('target', this.state.target.replace('#', ''));
+    params.set('colors', this.state.colors.map((c) => c.hex.replace('#', '')).join(','));
+    const url = `${location.origin}${location.pathname}?${params.toString()}`;
+    if (navigator.clipboard) navigator.clipboard.writeText(url).catch(() => {});
+    this.flashFeedback('link');
+  }
+
+  downloadImage(target, mixedHex, items) {
+    const canvas = document.createElement('canvas');
+    const w = 480, h = 120 + items.length * 40 + 40;
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#141414'; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = target; ctx.beginPath(); ctx.arc(46, 46, 26, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = mixedHex; ctx.beginPath(); ctx.arc(110, 46, 26, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#7a7a7a'; ctx.font = '13px sans-serif';
+    ctx.fillText('Target', 26, 86); ctx.fillText('Your mix', 88, 86);
+    let y = 130;
+    items.forEach((it) => {
+      ctx.fillStyle = it.hex; ctx.fillRect(24, y - 14, 18, 18);
+      ctx.fillStyle = '#f2f2f2'; ctx.font = '600 14px sans-serif';
+      ctx.fillText(it.displayName, 54, y);
+      ctx.fillStyle = '#7de0c9'; ctx.font = '600 14px monospace';
+      ctx.fillText(`${it.percent}%`, w - 70, y);
+      y += 40;
+    });
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'color-mix-recipe.png';
+    a.click();
+    this.flashFeedback('image');
+  }
+
+  renderVals() {
+    const colors = this.state.colors;
+    const colorsRGB = colors.map((c) => this.hexToRgb(c.hex));
+    const targetRGB = this.hexToRgb(this.state.target);
+    const weights = this.solveWeights(colorsRGB, targetRGB);
+    const mixed = [0, 0, 0];
+    for (let i = 0; i < colors.length; i++) for (let k = 0; k < 3; k++) mixed[k] += (weights[i] || 0) * colorsRGB[i][k];
+    const mixedHex = colors.length ? this.rgbToHex(mixed[0], mixed[1], mixed[2]) : '#ffffff';
+    let sq = 0;
+    for (let k = 0; k < 3; k++) sq += (mixed[k] - targetRGB[k]) ** 2;
+    const dist = Math.sqrt(sq);
+    const maxDist = Math.sqrt(3) * 255;
+    let match = colors.length ? Math.round(100 * (1 - dist / maxDist)) : 0;
+    match = Math.max(0, Math.min(100, match));
+
+    const sortOrder = this.props.sortOrder ?? 'Order added';
+    const maxColors = this.props.maxColors ?? 6;
+    const showRecipe = this.props.showRecipe ?? true;
+
+    const scaledParts = this.simplifyRatio(weights);
+    const unitMode = this.state.unitMode;
+    const totalMl = this.state.totalMl;
+
+    let list = colors.map((c, i) => {
+      const w = weights[i] || 0;
+      const percent = Math.round(w * 100);
+      const mlAmount = Math.round((percent / 100) * totalMl);
+      return {
+        ...c,
+        percent,
+        mlAmount,
+        parts: scaledParts[i] || 0,
+        percentWidth: `${percent}%`,
+        displayValue: unitMode === 'ml' ? `${mlAmount} ml` : `${percent}%`,
+        displayName: c.name && c.name.trim() ? c.name : `Color ${i + 1}`,
+        hexUpper: (c.hex || '').toUpperCase(),
+        onHexChange: (e) => this.updateColorHex(c.id, e.target.value),
+        onHexTextChange: (e) => this.updateColorHex(c.id, e.target.value),
+        onNameChange: (e) => this.updateColorName(c.id, e.target.value),
+        onRemove: () => this.removeColor(c.id),
+      };
+    });
+
+    if (sortOrder === 'Highest % first') list = [...list].sort((a, b) => b.percent - a.percent);
+
+    const recipeItems = list
+      .filter((it) => it.parts > 0)
+      .map((it, i) => ({
+        ...it,
+        stepNumber: i + 1,
+        recipeLine: unitMode === 'ml'
+          ? `${it.mlAmount} ml — ${it.displayName}`
+          : `${it.parts} part${it.parts === 1 ? '' : 's'} — ${it.displayName}`,
+      }));
+
+    const hasEnoughColors = colors.length >= 2;
+    const canSimplify = colors.length > 2;
+
+    let matchBadgeBg = 'rgba(255,255,255,0.06)';
+    let matchBadgeText = '#a0a0a0';
+    if (match >= 90) { matchBadgeBg = 'rgba(125,224,201,0.16)'; matchBadgeText = '#7de0c9'; }
+
+    const addDisabled = colors.length >= maxColors;
+
+    const presetDefs = [
+      ['Red', '#e3372f'], ['Yellow', '#f2c230'], ['Blue', '#1b3f8b'],
+      ['Cyan', '#2fb6c9'], ['Magenta', '#c23f9c'], ['White', '#f2f2f2'], ['Black', '#0d0d0d'],
+    ];
+    const presets = presetDefs.map(([name, hex]) => ({ name, hex, onAdd: () => this.addPreset(hex, name) }));
+
+    const feedback = this.state.feedback;
+    const recipeLines = [`Target: ${this.state.target.toUpperCase()}`, '', ...recipeItems.map((r) => `${r.recipeLine} (${r.percent}%)`)];
+
+    return {
+      colors: list,
+      recipeItems,
+      showRecipe,
+      presets,
+      target: this.state.target,
+      targetRgbLabel: `R ${targetRGB[0]} · G ${targetRGB[1]} · B ${targetRGB[2]}`,
+      mixedHex,
+      match,
+      matchBadgeBg,
+      matchBadgeText,
+      hasEnoughColors,
+      needsMoreColors: !hasEnoughColors,
+      colorCountLabel: `${colors.length} color${colors.length === 1 ? '' : 's'}`,
+      addButtonLabel: addDisabled ? 'Max colors reached' : '+ Custom color',
+      addDisabled,
+      addColor: () => this.addColor(),
+      onTargetColorChange: (e) => this.updateTarget(e.target.value),
+      onTargetTextChange: (e) => this.updateTarget(e.target.value),
+      image: this.state.image,
+      hasImage: !!this.state.image,
+      noImage: !this.state.image,
+      onImageUpload: (e) => this.onImageUpload(e),
+      onImageClick: (e) => this.onImageClick(e),
+      onImageRemove: () => this.removeImage(),
+      copyRecipeLabel: feedback === 'recipe' ? 'Copied!' : 'Copy recipe',
+      copyRecipeColor: feedback === 'recipe' ? '#7de0c9' : '#b0b0b0',
+      copyLinkLabel: feedback === 'link' ? 'Link copied' : 'Share',
+      copyLinkColor: feedback === 'link' ? '#7de0c9' : '#b0b0b0',
+      downloadLabel: feedback === 'image' ? 'Saved!' : 'Download image',
+      downloadColor: feedback === 'image' ? '#7de0c9' : '#b0b0b0',
+      copyRecipe: () => this.copyRecipe(recipeLines),
+      copyLink: () => this.copyLink(),
+      downloadImage: () => this.downloadImage(this.state.target, mixedHex, list),
+      canSimplify,
+      simplifyMix: () => this.simplifyMix(),
+      totalMl,
+      totalMlLabel: `${totalMl} ml`,
+      onVolumeChange: (e) => this.onVolumeChange(e),
+      setModePercent: () => this.setModePercent(),
+      setModeMl: () => this.setModeMl(),
+      percentBtnBg: unitMode === 'percentage' ? '#2a2a2a' : 'transparent',
+      percentBtnColor: unitMode === 'percentage' ? '#7de0c9' : '#8a8a8a',
+      mlBtnBg: unitMode === 'ml' ? '#2a2a2a' : 'transparent',
+      mlBtnColor: unitMode === 'ml' ? '#7de0c9' : '#8a8a8a',
+    };
+  }
+}
+
+</script>
+</body>
+</html>

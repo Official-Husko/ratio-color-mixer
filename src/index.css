@@ -1,0 +1,230 @@
+:root {
+  --bg: #141414;
+  --card-bg: #1c1c1c;
+  --card-border: #2a2a2a;
+  --row-bg: #222222;
+
+  --text: #f2f2f2;
+  --text-secondary: #9a9a9a;
+  --text-muted: #7a7a7a;
+  --text-muted-2: #6a6a6a;
+  --text-faint: #5a5a5a;
+
+  --divider: #2a2a2a;
+  --divider-soft: #262626;
+  --border-dashed: #3a3a3a;
+  --border-input: #363636;
+
+  --accent: #7de0c9;
+  --accent-hover: #9becd9;
+  --accent-bg: rgba(125, 224, 201, 0.16);
+
+  --sans: 'Space Grotesk', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+
+  color-scheme: dark;
+  color: var(--text);
+  background: var(--bg);
+  font-family: var(--sans);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+input[type='color']::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type='color']::-webkit-color-swatch {
+  border: none;
+}
+
+::placeholder {
+  color: var(--text-faint);
+}
+
+a {
+  color: var(--accent);
+  transition: color 0.15s ease, filter 0.15s ease;
+}
+
+a:hover {
+  color: var(--accent-hover);
+}
+
+#root {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 40px 48px 80px;
+}
+
+@media (max-width: 760px) {
+  #root {
+    padding: 24px 20px 60px;
+  }
+}
+
+/* --- interaction: hover/active feedback + light motion --- */
+
+button {
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease,
+    opacity 0.15s ease, filter 0.15s ease;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+button:not(:disabled):hover {
+  filter: brightness(1.18);
+}
+
+button:not(:disabled):active {
+  filter: brightness(0.92);
+  transform: scale(0.97);
+}
+
+.swatch {
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.swatch:has(input[type='color']):hover {
+  transform: scale(1.05);
+  border-color: var(--accent) !important;
+}
+
+.preset-btn:hover .preset-swatch {
+  transform: scale(1.12);
+  border-color: var(--accent) !important;
+}
+
+.preset-swatch {
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.color-row {
+  transition: background-color 0.15s ease;
+}
+
+.color-row:hover {
+  background: #262626 !important;
+}
+
+.mix-row {
+  transition: background-color 0.15s ease;
+  border-radius: 8px;
+}
+
+.mix-row:hover {
+  background: var(--row-bg);
+}
+
+.dashed-box {
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.dashed-box:hover {
+  border-color: var(--accent) !important;
+  background: rgba(125, 224, 201, 0.04);
+}
+
+.dashed-btn:not(:disabled):hover {
+  border-color: var(--accent) !important;
+  background: rgba(125, 224, 201, 0.06);
+}
+
+.remove-btn:hover {
+  color: #e3372f !important;
+  transform: scale(1.1);
+}
+
+.icon-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 14px;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.link-btn:hover {
+  color: var(--accent-hover) !important;
+}
+
+.action-btn:not(:disabled):hover {
+  border-color: var(--accent) !important;
+}
+
+.segment-btn {
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ratio-segment {
+  transition: width 0.3s ease;
+}
+
+.footer-icon-link {
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.footer-icon-link:hover {
+  color: var(--text) !important;
+  transform: translateY(-1px);
+}
+
+input[type='range'] {
+  cursor: pointer;
+}
+
+@keyframes feedback-pop {
+  0% {
+    transform: scale(0.94);
+  }
+  60% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.feedback-pop {
+  animation: feedback-pop 0.25s ease;
+}
+
+@keyframes badge-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.match-badge {
+  animation: badge-in 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
