@@ -2,30 +2,7 @@ export function Header() {
   return (
     <>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 36 }}>
-        <div style={{ position: 'relative', width: 28, height: 28, flex: 'none' }}>
-          <div
-            style={{
-              position: 'absolute',
-              left: 0,
-              top: 0,
-              width: 28,
-              height: 28,
-              borderRadius: '50%',
-              border: '1.5px solid var(--border-dashed)',
-            }}
-          />
-          <div
-            style={{
-              position: 'absolute',
-              left: 8,
-              top: 0,
-              width: 20,
-              height: 20,
-              borderRadius: '50%',
-              background: 'var(--accent)',
-            }}
-          />
-        </div>
+        <img src="/favicon.svg" alt="" width={28} height={28} style={{ flex: 'none' }} />
         <div style={{ fontWeight: 700, fontSize: 19, letterSpacing: '-0.01em' }}>Ratio</div>
       </div>
 

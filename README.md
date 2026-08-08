@@ -62,6 +62,10 @@ The `api` service reads `REDIS_URL`, `SHARE_TTL_SECONDS` (default 2592000 = 30 d
 
 A GitHub Actions workflow (`.github/workflows/docker.yml`) lints, tests, and builds both the app and the share API on every push and pull request, and publishes both images (`ghcr.io/<owner>/<repo>` and `ghcr.io/<owner>/<repo>-api`) on pushes to `main` (tagged `latest`) and on version tags (`v1.2.3`).
 
+## SEO
+
+`index.html` (canonical/OG/Twitter meta tags + JSON-LD) and `public/robots.txt`/`public/sitemap.xml` hardcode the production domain `https://ratio.lonewolves.dev`. If you deploy this somewhere else, update the domain in those three files (and regenerate `public/og-image.png`, the 1200×630 social preview card, if you want it to reflect a different look).
+
 ## Project structure
 
 ```text
