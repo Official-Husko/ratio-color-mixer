@@ -112,7 +112,7 @@ export function useMixerState() {
   )
 
   const viewModel = useMemo(
-    () => buildViewModel(colors, target, solveResult, totalMl, unitMode, 'added'),
+    () => buildViewModel(colors, target, solveResult, totalMl, unitMode, 'percent-desc'),
     [colors, target, solveResult, totalMl, unitMode],
   )
 
@@ -137,6 +137,10 @@ export function useMixerState() {
 
   function removeColor(id: string) {
     setColors((prev) => prev.filter((c) => c.id !== id))
+  }
+
+  function clearAllColors() {
+    setColors([])
   }
 
   function updateColorHex(id: string, hex: string) {
@@ -214,6 +218,7 @@ export function useMixerState() {
       addPreset,
       addCustomColor,
       removeColor,
+      clearAllColors,
       updateColorHex,
       updateColorName,
       setTarget,

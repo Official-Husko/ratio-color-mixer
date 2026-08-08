@@ -24,6 +24,7 @@ export function App() {
             colorCountLabel={viewModel.colorCountLabel}
             onCustomColorPicked={actions.addCustomColor}
             onSimplify={actions.simplifyMix}
+            onClearAll={actions.clearAllColors}
             onUpdateHex={actions.updateColorHex}
             onUpdateName={actions.updateColorName}
             onRemove={actions.removeColor}

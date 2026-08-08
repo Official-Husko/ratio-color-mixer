@@ -14,6 +14,7 @@ interface YourColorsCardProps {
   colorCountLabel: string
   onCustomColorPicked: (hex: string) => void
   onSimplify: () => void
+  onClearAll: () => void
   onUpdateHex: (id: string, hex: string) => void
   onUpdateName: (id: string, name: string) => void
   onRemove: (id: string) => void
@@ -27,6 +28,7 @@ export function YourColorsCard({
   colorCountLabel,
   onCustomColorPicked,
   onSimplify,
+  onClearAll,
   onUpdateHex,
   onUpdateName,
   onRemove,
@@ -68,6 +70,29 @@ export function YourColorsCard({
             >
               <Icon name="shuffle" />
               Simplify mix
+            </button>
+          )}
+          {colors.length > 0 && (
+            <button
+              type="button"
+              onClick={onClearAll}
+              class="link-btn clear-all-btn"
+              style={{
+                border: 'none',
+                background: 'transparent',
+                color: 'var(--text-muted)',
+                fontFamily: 'var(--mono)',
+                fontSize: 11,
+                cursor: 'pointer',
+                padding: 0,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                textDecoration: 'underline',
+              }}
+            >
+              <Icon name="trash-can" />
+              Clear all
             </button>
           )}
           <div style={{ fontFamily: 'var(--mono)', fontSize: 11.5, color: 'var(--text-muted)' }}>

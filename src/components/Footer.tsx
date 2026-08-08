@@ -34,7 +34,7 @@ export function Footer() {
           rel="noreferrer"
           class="footer-icon-link"
           aria-label="View source on GitHub"
-          style={{ color: 'var(--text-muted)', fontSize: 18, display: 'flex' }}
+          style={{ color: 'var(--text-muted)', fontSize: 18, display: 'flex', textDecoration: 'none' }}
         >
           <Icon name="github" brand />
         </a>

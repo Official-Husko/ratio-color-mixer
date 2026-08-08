@@ -35,5 +35,4 @@ export const PERSIST_DEBOUNCE_MS = 300
 export const STORAGE_KEY = 'ratio:mixer-state:v1'
 export const SHARE_PARAM = 's'
 
-// TODO: fill in once the repo has a home — the footer link hides itself while this is empty.
-export const GITHUB_URL = ''
+export const GITHUB_URL = 'https://github.com/Official-Husko/ratio-color-mixer'

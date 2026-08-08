@@ -164,6 +164,10 @@ button:not(:disabled):active {
   color: var(--accent-hover) !important;
 }
 
+.clear-all-btn:hover {
+  color: #e3372f !important;
+}
+
 .action-btn:not(:disabled):hover {
   border-color: var(--accent) !important;
 }
