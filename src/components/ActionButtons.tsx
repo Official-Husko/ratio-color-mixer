@@ -23,7 +23,8 @@ function buttonStyle(active: boolean, error = false) {
 export function ActionButtons({ feedback, isSharing, onCopyRecipe, onDownloadImage, onShare }: ActionButtonsProps) {
   const recipeActive = feedback === 'recipe'
   const imageActive = feedback === 'image'
-  const linkActive = feedback === 'link'
+  const linkActive = feedback === 'link' || feedback === 'link-fallback'
+  const linkFallback = feedback === 'link-fallback'
   const linkError = feedback === 'link-error'
 
   return (
@@ -54,7 +55,7 @@ export function ActionButtons({ feedback, isSharing, onCopyRecipe, onDownloadIma
         style={buttonStyle(linkActive, linkError)}
       >
         <Icon name={linkError ? 'triangle-exclamation' : linkActive ? 'check' : 'share-nodes'} />
-        {isSharing ? 'Sharing…' : linkError ? "Couldn't share" : linkActive ? 'Link copied' : 'Share'}
+        {isSharing ? 'Sharing…' : linkError ? "Couldn't share" : linkFallback ? 'Link ready' : linkActive ? 'Link copied' : 'Share'}
       </button>
     </div>
   )

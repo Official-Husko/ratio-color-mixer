@@ -1,3 +1,4 @@
+import type { TargetedEvent } from 'preact'
 import type { FeedbackKind, UnitMode, ViewModel } from '../types'
 import type { VolumeUnit } from '../lib/units'
 import { card, segmentedButton, segmentedTrack } from '../styles'
@@ -6,6 +7,7 @@ import { RatioBar } from './RatioBar'
 import { RecipeList } from './RecipeList'
 import { ActionButtons } from './ActionButtons'
 import { BatchSizeControl } from './BatchSizeControl'
+import { Icon } from './ui/Icon'
 
 interface EstimatedMixCardProps {
   vm: ViewModel
@@ -15,12 +17,14 @@ interface EstimatedMixCardProps {
   volumeUnit: VolumeUnit
   feedback: FeedbackKind
   isSharing: boolean
+  sharedLinkUrl: string | null
   onVolumeChange: (ml: number) => void
   onSetUnitMode: (mode: UnitMode) => void
   onSetVolumeUnit: (unit: VolumeUnit) => void
   onCopyRecipe: () => void
   onDownloadImage: () => void
   onShare: () => void
+  onDismissSharedLink: () => void
 }
 
 export function EstimatedMixCard({
@@ -31,12 +35,14 @@ export function EstimatedMixCard({
   volumeUnit,
   feedback,
   isSharing,
+  sharedLinkUrl,
   onVolumeChange,
   onSetUnitMode,
   onSetVolumeUnit,
   onCopyRecipe,
   onDownloadImage,
   onShare,
+  onDismissSharedLink,
 }: EstimatedMixCardProps) {
   return (
     <div style={{ ...card, padding: 26, position: 'sticky', top: 32 }}>
@@ -169,6 +175,49 @@ export function EstimatedMixCard({
             onDownloadImage={onDownloadImage}
             onShare={onShare}
           />
+
+          {sharedLinkUrl && (
+            <div
+              style={{
+                marginTop: 12,
+                padding: '10px 12px',
+                borderRadius: 10,
+                background: 'rgba(125,224,201,0.08)',
+                border: '1px solid var(--accent-bg)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
+                  Your browser wouldn't let us copy this automatically — select and copy it yourself:
+                </div>
+                <button
+                  type="button"
+                  onClick={onDismissSharedLink}
+                  aria-label="Dismiss"
+                  class="icon-btn"
+                  style={{ flex: 'none' }}
+                >
+                  <Icon name="xmark" />
+                </button>
+              </div>
+              <input
+                type="text"
+                readonly
+                value={sharedLinkUrl}
+                onClick={(e: TargetedEvent<HTMLInputElement>) => e.currentTarget.select()}
+                style={{
+                  width: '100%',
+                  border: '1px solid var(--border-input)',
+                  borderRadius: 8,
+                  background: 'var(--row-bg)',
+                  color: 'var(--text)',
+                  fontFamily: 'var(--mono)',
+                  fontSize: 12.5,
+                  padding: '8px 10px',
+                }}
+              />
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -7,8 +7,20 @@ import { EstimatedMixCard } from './components/EstimatedMixCard'
 import { Footer } from './components/Footer'
 
 export function App() {
-  const { colors, target, image, totalMl, unitMode, volumeUnit, feedback, isSharing, shareCodeStatus, viewModel, actions } =
-    useMixerState()
+  const {
+    colors,
+    target,
+    image,
+    totalMl,
+    unitMode,
+    volumeUnit,
+    feedback,
+    isSharing,
+    shareCodeStatus,
+    sharedLinkUrl,
+    viewModel,
+    actions,
+  } = useMixerState()
 
   return (
     <div>
@@ -67,12 +79,14 @@ export function App() {
           volumeUnit={volumeUnit}
           feedback={feedback}
           isSharing={isSharing}
+          sharedLinkUrl={sharedLinkUrl}
           onVolumeChange={actions.setTotalMl}
           onSetUnitMode={actions.setUnitMode}
           onSetVolumeUnit={actions.setVolumeUnit}
           onCopyRecipe={actions.copyRecipe}
           onDownloadImage={actions.downloadImage}
           onShare={actions.copyShareLink}
+          onDismissSharedLink={actions.dismissSharedLink}
         />
       </div>
 

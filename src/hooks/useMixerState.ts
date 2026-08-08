@@ -80,6 +80,11 @@ export function useMixerState() {
   const [volumeUnit, setVolumeUnit] = useState<VolumeUnit>(initial.volumeUnit)
   const [feedback, setFeedback] = useState<FeedbackKind>(null)
   const [isSharing, setIsSharing] = useState(false)
+  // Set only when a share link was created successfully but couldn't be
+  // auto-copied (e.g. navigator.clipboard is unavailable outside a secure
+  // context — plain HTTP on a LAN IP, not localhost/HTTPS) so the link isn't
+  // just lost; the user can select and copy it manually instead.
+  const [sharedLinkUrl, setSharedLinkUrl] = useState<string | null>(null)
   const [shareCodeStatus, setShareCodeStatus] = useState<ShareCodeStatus>(
     typeof location !== 'undefined' && getShareCodeFromUrl(location.search) ? 'loading' : null,
   )
@@ -263,18 +268,27 @@ export function useMixerState() {
     }
 
     setIsSharing(true)
+    setSharedLinkUrl(null)
     try {
       const id = await createShareCode(payload)
-      if (await copyText(buildShareCodeUrl(id))) {
+      const url = buildShareCodeUrl(id)
+      // The link was created successfully either way — copyText failing just
+      // means the browser wouldn't let us write to the clipboard for you.
+      if (await copyText(url)) {
         flashFeedback('link')
       } else {
-        flashFeedback('link-error')
+        setSharedLinkUrl(url)
+        flashFeedback('link-fallback')
       }
     } catch {
       flashFeedback('link-error')
     } finally {
       setIsSharing(false)
     }
+  }
+
+  function dismissSharedLink() {
+    setSharedLinkUrl(null)
   }
 
   return {
@@ -287,6 +301,7 @@ export function useMixerState() {
     feedback,
     isSharing,
     shareCodeStatus,
+    sharedLinkUrl,
     viewModel,
     actions: {
       addPreset,
@@ -303,6 +318,7 @@ export function useMixerState() {
       setUnitMode,
       setVolumeUnit,
       simplifyMix,
+      dismissSharedLink,
       copyRecipe,
       downloadImage,
       copyShareLink,
