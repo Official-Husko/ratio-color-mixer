@@ -1,4 +1,4 @@
-import type { JSX } from 'preact'
+import type { TargetedEvent } from 'preact'
 import { card } from '../styles'
 import { Swatch } from './ui/Swatch'
 import { ImageSampler } from './ImageSampler'
@@ -42,7 +42,7 @@ export function TargetColorCard({
           <input
             type="text"
             value={target}
-            onInput={(e: JSX.TargetedEvent<HTMLInputElement>) => onTargetChange(e.currentTarget.value)}
+            onInput={(e: TargetedEvent<HTMLInputElement>) => onTargetChange(e.currentTarget.value)}
             style={{
               border: 'none',
               outline: 'none',

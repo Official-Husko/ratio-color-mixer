@@ -1,10 +1,10 @@
-import type { JSX } from 'preact'
+import type { CSSProperties } from 'preact'
 
 interface IconProps {
   name: string
   brand?: boolean
   class?: string
-  style?: JSX.CSSProperties
+  style?: CSSProperties
 }
 
 export function Icon({ name, brand, class: className, style }: IconProps) {

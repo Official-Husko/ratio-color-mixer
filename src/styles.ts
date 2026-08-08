@@ -1,20 +1,20 @@
-import type { JSX } from 'preact'
+import type { CSSProperties } from 'preact'
 
-export const card: JSX.CSSProperties = {
+export const card: CSSProperties = {
   background: 'var(--card-bg)',
   border: '1px solid var(--card-border)',
   borderRadius: 20,
   padding: 22,
 }
 
-export const dashedBox: JSX.CSSProperties = {
+export const dashedBox: CSSProperties = {
   border: '1.5px dashed var(--border-dashed)',
   borderRadius: 14,
   padding: 22,
   textAlign: 'center',
 }
 
-export const pillButton: JSX.CSSProperties = {
+export const pillButton: CSSProperties = {
   padding: '9px 14px',
   borderRadius: 10,
   border: '1px solid var(--border-input)',
@@ -25,7 +25,7 @@ export const pillButton: JSX.CSSProperties = {
   cursor: 'pointer',
 }
 
-export const segmentedTrack: JSX.CSSProperties = {
+export const segmentedTrack: CSSProperties = {
   display: 'flex',
   background: 'var(--bg)',
   borderRadius: 8,
@@ -33,7 +33,7 @@ export const segmentedTrack: JSX.CSSProperties = {
   gap: 2,
 }
 
-export function segmentedButton(active: boolean): JSX.CSSProperties {
+export function segmentedButton(active: boolean): CSSProperties {
   return {
     padding: '4px 10px',
     borderRadius: 6,

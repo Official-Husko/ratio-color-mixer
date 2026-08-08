@@ -187,7 +187,6 @@ export function useMixerState() {
       mixedHex: viewModel.mixedHex,
       match: viewModel.match,
       totalMl,
-      unitMode,
       colors: viewModel.colors,
     })
     downloadCanvasAsPng(canvas)

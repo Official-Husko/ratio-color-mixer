@@ -1,4 +1,4 @@
-import type { JSX } from 'preact'
+import type { TargetedEvent } from 'preact'
 
 interface SwatchProps {
   hex: string
@@ -27,7 +27,7 @@ export function Swatch({ hex, size, radius, editable, onChange }: SwatchProps) {
         <input
           type="color"
           value={hex}
-          onChange={(e: JSX.TargetedEvent<HTMLInputElement>) => onChange?.(e.currentTarget.value)}
+          onChange={(e: TargetedEvent<HTMLInputElement>) => onChange?.(e.currentTarget.value)}
           style={{
             position: 'absolute',
             inset: 0,

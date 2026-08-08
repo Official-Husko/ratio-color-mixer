@@ -1,4 +1,4 @@
-import type { JSX } from 'preact'
+import type { TargetedEvent, TargetedMouseEvent } from 'preact'
 import { dashedBox } from '../styles'
 import { Icon } from './ui/Icon'
 
@@ -18,7 +18,7 @@ export function ImageSampler({ image, onUpload, onSample, onRemove }: ImageSampl
         <input
           type="file"
           accept="image/*"
-          onChange={(e: JSX.TargetedEvent<HTMLInputElement>) => {
+          onChange={(e: TargetedEvent<HTMLInputElement>) => {
             const file = e.currentTarget.files?.[0]
             if (file) onUpload(file)
           }}
@@ -32,7 +32,7 @@ export function ImageSampler({ image, onUpload, onSample, onRemove }: ImageSampl
     <div>
       <img
         src={image}
-        onClick={(e: JSX.TargetedMouseEvent<HTMLImageElement>) => onSample(e.currentTarget, e.clientX, e.clientY)}
+        onClick={(e: TargetedMouseEvent<HTMLImageElement>) => onSample(e.currentTarget, e.clientX, e.clientY)}
         style={{
           width: '100%',
           maxHeight: 160,

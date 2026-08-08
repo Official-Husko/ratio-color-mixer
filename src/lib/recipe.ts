@@ -2,45 +2,7 @@ import { colorDistance, hexToRgb, rgbToHex, type MixResult } from './color-math'
 import type { ColorItem, MatchBadge, RecipeItem, SortMode, UnitMode, ViewModel } from '../types'
 
 const MAX_RGB_DISTANCE = Math.sqrt(3) * 255
-const PARTS_SCALE = 12
-const PARTS_MIN_WEIGHT = 0.02
 const SIMPLIFY_KEEP_THRESHOLD = 0.05
-
-function gcd(a: number, b: number): number {
-  a = Math.abs(a)
-  b = Math.abs(b)
-  return b === 0 ? a : gcd(b, a % b)
-}
-
-/**
- * Reduce solved weights to a small whole-number ratio, e.g. "3 parts : 2
- * parts : 1 part". Contributors too small to round to a whole part (below
- * PARTS_MIN_WEIGHT) still get a fractional value on that exact same scale —
- * e.g. 0.08 — rather than being flattened to 0, so two trace colors remain
- * distinguishable instead of both reading as an identical "<1 part".
- */
-export function simplifyRatio(weights: number[]): number[] {
-  const scaled = weights.map((w) => (w > PARTS_MIN_WEIGHT ? Math.max(1, Math.round(w * PARTS_SCALE)) : 0))
-  const positives = scaled.filter((v) => v > 0)
-
-  if (positives.length === 0) {
-    // No color crossed the whole-part threshold, so there's no whole-number
-    // basis to reduce against — scale directly instead.
-    return weights.map((w) => w * PARTS_SCALE)
-  }
-
-  const divisor = positives.reduce((a, b) => gcd(a, b))
-  return scaled.map((v, i) => (v > 0 ? v / divisor : (weights[i] * PARTS_SCALE) / divisor))
-}
-
-function formatParts(parts: number): string {
-  if (Number.isInteger(parts)) return `${parts} part${parts === 1 ? '' : 's'}`
-  // A fixed 2 decimals would round very small trace fractions down to a
-  // misleading "0.00" — use enough decimals to keep ~2 significant figures
-  // at any magnitude instead, so distinct trace amounts stay distinguishable.
-  const decimals = Math.min(4, Math.max(2, 1 - Math.floor(Math.log10(parts))))
-  return `${parts.toFixed(decimals)} parts`
-}
 
 function computeMatch(mixed: { r: number; g: number; b: number }, target: { r: number; g: number; b: number }): number {
   const distance = colorDistance(mixed, target)
@@ -76,7 +38,6 @@ export function buildViewModel(
   const weights = result?.weights ?? colors.map(() => 0)
   const mixedRgb = result?.mixed ?? hexToRgb(target)
   const targetRgb = hexToRgb(target)
-  const parts = simplifyRatio(weights)
 
   // A weight that rounds to 0.0% at one decimal is treated as a true zero and
   // dropped from the mix ratio entirely (matches the solver's own visible-row
@@ -99,7 +60,7 @@ export function buildViewModel(
         percent,
         exactPercent,
         mlAmount,
-        parts: parts[index] ?? 0,
+        exactMl,
         percentWidth: `${exactPercent}%`,
         displayValue:
           unitMode === 'ml' ? (belowOneMl ? '<1 ml' : `${mlAmount} ml`) : belowOnePercent ? '<1%' : `${percent}%`,
@@ -112,17 +73,16 @@ export function buildViewModel(
   if (sortMode === 'percent-desc') rows = [...rows].sort((a, b) => b.exactPercent - a.exactPercent)
 
   // Recipe mirrors exactly which colors Mix ratio shows (rows already
-  // excludes true zeros) — a color trace enough to show as "<1%" up there
-  // shouldn't silently vanish down here just because it rounds to 0 parts.
+  // excludes true zeros), and always measures in ml regardless of the %/ml
+  // toggle — a volume is something you can actually pour, whereas a
+  // whole-number "part" ratio can't represent a small trace contributor at
+  // all and drifts from the true proportions at a coarse scale.
   const recipeItems: RecipeItem[] = rows.map((row, index) => ({
     stepNumber: index + 1,
     hex: row.hex,
     displayName: row.displayName,
     percent: row.percent,
-    recipeLine:
-      unitMode === 'ml'
-        ? `${row.mlAmount > 0 ? `${row.mlAmount} ml` : row.exactLabel} — ${row.displayName}`
-        : `${formatParts(row.parts)} — ${row.displayName}`,
+    recipeLine: `${row.mlAmount > 0 ? `${row.mlAmount} ml` : `${row.exactMl.toFixed(2)} ml`} — ${row.displayName}`,
   }))
 
   const match = colors.length ? computeMatch(mixedRgb, targetRgb) : 0

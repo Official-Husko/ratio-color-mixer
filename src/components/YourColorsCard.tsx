@@ -1,4 +1,4 @@
-import type { JSX } from 'preact'
+import type { TargetedEvent } from 'preact'
 import { useRef } from 'preact/hooks'
 import type { ColorItem } from '../types'
 import { card } from '../styles'
@@ -140,7 +140,7 @@ export function YourColorsCard({
         type="color"
         tabIndex={-1}
         aria-hidden="true"
-        onChange={(e: JSX.TargetedEvent<HTMLInputElement>) => onCustomColorPicked(e.currentTarget.value)}
+        onChange={(e: TargetedEvent<HTMLInputElement>) => onCustomColorPicked(e.currentTarget.value)}
         style={{ position: 'absolute', width: 0, height: 0, opacity: 0, border: 'none', padding: 0, pointerEvents: 'none' }}
       />
     </div>

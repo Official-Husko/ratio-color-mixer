@@ -1,4 +1,4 @@
-import type { JSX } from 'preact'
+import type { TargetedEvent } from 'preact'
 import type { FeedbackKind, UnitMode, ViewModel } from '../types'
 import { card, segmentedButton, segmentedTrack } from '../styles'
 import { Swatch } from './ui/Swatch'
@@ -86,7 +86,7 @@ export function EstimatedMixCard({
               max={1000}
               step={10}
               value={totalMl}
-              onInput={(e: JSX.TargetedEvent<HTMLInputElement>) => onVolumeChange(Number(e.currentTarget.value))}
+              onInput={(e: TargetedEvent<HTMLInputElement>) => onVolumeChange(Number(e.currentTarget.value))}
               style={{ flex: 1, accentColor: 'var(--accent)' }}
             />
             <div style={{ fontFamily: 'var(--mono)', fontSize: 13, width: 60, textAlign: 'right', flex: 'none' }}>

@@ -14,7 +14,8 @@ export interface MixColorRow extends ColorItem {
   /** Unrounded percent contribution, e.g. 0.4 — used for sorting and shown exactly in exactLabel. */
   exactPercent: number
   mlAmount: number
-  parts: number
+  /** Unrounded ml amount — Recipe always uses this (or mlAmount) regardless of the %/ml toggle. */
+  exactMl: number
   percentWidth: string
   /** Rounded for normal rows; "<1%"/"<1 ml" for a nonzero contribution that would otherwise round to 0. */
   displayValue: string

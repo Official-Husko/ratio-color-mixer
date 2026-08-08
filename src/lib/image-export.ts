@@ -1,11 +1,8 @@
-import type { UnitMode } from '../types'
-
 export interface RecipeImageColor {
   hex: string
   displayName: string
-  percent: number
   mlAmount: number
-  parts: number
+  exactMl: number
 }
 
 export interface RecipeImageParams {
@@ -13,7 +10,6 @@ export interface RecipeImageParams {
   mixedHex: string
   match: number
   totalMl: number
-  unitMode: UnitMode
   colors: RecipeImageColor[]
 }
 
@@ -23,7 +19,7 @@ const ROW_HEIGHT = 42
 const PADDING = 28
 
 export function buildRecipeImageCanvas(params: RecipeImageParams): HTMLCanvasElement {
-  const rows = params.colors.filter((c) => c.parts > 0)
+  const rows = params.colors
   const height = HEADER_HEIGHT + rows.length * ROW_HEIGHT + PADDING
 
   const canvas = document.createElement('canvas')
@@ -70,7 +66,7 @@ export function buildRecipeImageCanvas(params: RecipeImageParams): HTMLCanvasEle
     ctx.font = '600 14px "Space Grotesk", sans-serif'
     ctx.fillText(row.displayName, PADDING + 32, y + 15)
 
-    const valueText = params.unitMode === 'ml' ? `${row.mlAmount} ml` : `${row.percent}%`
+    const valueText = row.mlAmount > 0 ? `${row.mlAmount} ml` : `${row.exactMl.toFixed(2)} ml`
     ctx.fillStyle = '#7de0c9'
     ctx.font = '600 14px "IBM Plex Mono", monospace'
     ctx.fillText(valueText, WIDTH - PADDING - 90, y + 15)
