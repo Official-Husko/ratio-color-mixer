@@ -73,11 +73,17 @@ export function EstimatedMixCard({
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
               <Swatch hex={target} size={96} radius={20} />
               <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Target</div>
+              <div style={{ fontSize: 11.5, color: 'var(--text-muted)', fontFamily: 'var(--mono)' }}>
+                {target.toUpperCase()}
+              </div>
             </div>
             <div style={{ fontSize: 22, color: '#4a4a4a' }}>→</div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
               <Swatch hex={vm.mixedHex} size={96} radius={20} />
               <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Your mix</div>
+              <div style={{ fontSize: 11.5, color: 'var(--text-muted)', fontFamily: 'var(--mono)' }}>
+                {vm.mixedHex.toUpperCase()}
+              </div>
             </div>
           </div>
 
