@@ -112,7 +112,7 @@ jobs:
           else
             echo "tag=sha-${{ steps.sha.outputs.short }}" >> "$GITHUB_OUTPUT"
             echo "title=Build ${{ steps.sha.outputs.short }}" >> "$GITHUB_OUTPUT"
-            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create release
