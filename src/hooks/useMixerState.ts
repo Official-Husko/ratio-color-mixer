@@ -7,10 +7,12 @@ import { loadState, saveState } from '../lib/storage'
 import { naturalCoordsFromClick, readFileAsDataUrl, sampleImagePixel } from '../lib/image-sample'
 import { buildRecipeImageCanvas, downloadCanvasAsPng } from '../lib/image-export'
 import { generateId } from '../lib/id'
+import { isVolumeUnit, type VolumeUnit } from '../lib/units'
 import {
   DEFAULT_COLORS,
   DEFAULT_TARGET,
   DEFAULT_TOTAL_ML,
+  DEFAULT_VOLUME_UNIT,
   FEEDBACK_DURATION_MS,
   PERSIST_DEBOUNCE_MS,
   SHARE_PARAM,
@@ -26,6 +28,7 @@ interface InitialState {
   target: string
   totalMl: number
   unitMode: UnitMode
+  volumeUnit: VolumeUnit
   fromShareLink: boolean
 }
 
@@ -37,6 +40,7 @@ function resolveInitialState(): InitialState {
       target: shared.target,
       totalMl: shared.totalMl,
       unitMode: shared.unitMode,
+      volumeUnit: shared.volumeUnit,
       fromShareLink: true,
     }
   }
@@ -48,6 +52,8 @@ function resolveInitialState(): InitialState {
       target: stored.target,
       totalMl: stored.totalMl,
       unitMode: stored.unitMode,
+      // Older stored sessions predate unit selection and won't have this field.
+      volumeUnit: isVolumeUnit(stored.volumeUnit) ? stored.volumeUnit : DEFAULT_VOLUME_UNIT,
       fromShareLink: false,
     }
   }
@@ -57,6 +63,7 @@ function resolveInitialState(): InitialState {
     target: DEFAULT_TARGET,
     totalMl: DEFAULT_TOTAL_ML,
     unitMode: 'percentage',
+    volumeUnit: DEFAULT_VOLUME_UNIT,
     fromShareLink: false,
   }
 }
@@ -68,6 +75,7 @@ export function useMixerState() {
   const [image, setImage] = useState<string | null>(null)
   const [totalMl, setTotalMl] = useState(initial.totalMl)
   const [unitMode, setUnitMode] = useState<UnitMode>(initial.unitMode)
+  const [volumeUnit, setVolumeUnit] = useState<VolumeUnit>(initial.volumeUnit)
   const [feedback, setFeedback] = useState<FeedbackKind>(null)
 
   const feedbackTimer = useRef<ReturnType<typeof setTimeout>>()
@@ -91,12 +99,13 @@ export function useMixerState() {
         target,
         totalMl,
         unitMode,
+        volumeUnit,
         colors: colors.map((c) => ({ hex: c.hex, name: c.name })),
       }
       saveState(payload)
     }, PERSIST_DEBOUNCE_MS)
     return () => clearTimeout(persistTimer.current)
-  }, [colors, target, totalMl, unitMode])
+  }, [colors, target, totalMl, unitMode, volumeUnit])
 
   useEffect(() => () => clearTimeout(feedbackTimer.current), [])
 
@@ -112,8 +121,8 @@ export function useMixerState() {
   )
 
   const viewModel = useMemo(
-    () => buildViewModel(colors, target, solveResult, totalMl, unitMode, 'percent-desc'),
-    [colors, target, solveResult, totalMl, unitMode],
+    () => buildViewModel(colors, target, solveResult, totalMl, unitMode, volumeUnit, 'percent-desc'),
+    [colors, target, solveResult, totalMl, unitMode, volumeUnit],
   )
 
   function addColor(hex: string, name: string): void {
@@ -187,6 +196,7 @@ export function useMixerState() {
       mixedHex: viewModel.mixedHex,
       match: viewModel.match,
       totalMl,
+      volumeUnit,
       colors: viewModel.colors,
     })
     downloadCanvasAsPng(canvas)
@@ -199,6 +209,7 @@ export function useMixerState() {
       target,
       totalMl,
       unitMode,
+      volumeUnit,
       colors: colors.map((c) => ({ hex: c.hex, name: c.name })),
     }
     if (await copyText(buildShareUrl(payload))) flashFeedback('link')
@@ -210,6 +221,7 @@ export function useMixerState() {
     image,
     totalMl,
     unitMode,
+    volumeUnit,
     feedback,
     viewModel,
     actions: {
@@ -225,6 +237,7 @@ export function useMixerState() {
       removeImage,
       setTotalMl,
       setUnitMode,
+      setVolumeUnit,
       simplifyMix,
       copyRecipe,
       downloadImage,

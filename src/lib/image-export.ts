@@ -1,7 +1,8 @@
+import { formatVolumeSmart, type VolumeUnit } from './units'
+
 export interface RecipeImageColor {
   hex: string
   displayName: string
-  mlAmount: number
   exactMl: number
 }
 
@@ -10,6 +11,7 @@ export interface RecipeImageParams {
   mixedHex: string
   match: number
   totalMl: number
+  volumeUnit: VolumeUnit
   colors: RecipeImageColor[]
 }
 
@@ -55,7 +57,7 @@ export function buildRecipeImageCanvas(params: RecipeImageParams): HTMLCanvasEle
   ctx.fillText(`${params.match}% match`, PADDING + swatchSize * 2 + 48, swatchY + 16)
   ctx.fillStyle = '#9a9a9a'
   ctx.font = '12px "IBM Plex Mono", monospace'
-  ctx.fillText(`Batch: ${params.totalMl} ml`, PADDING + swatchSize * 2 + 48, swatchY + 36)
+  ctx.fillText(`Batch: ${formatVolumeSmart(params.totalMl, params.volumeUnit)}`, PADDING + swatchSize * 2 + 48, swatchY + 36)
 
   let y = HEADER_HEIGHT
   for (const row of rows) {
@@ -66,10 +68,10 @@ export function buildRecipeImageCanvas(params: RecipeImageParams): HTMLCanvasEle
     ctx.font = '600 14px "Space Grotesk", sans-serif'
     ctx.fillText(row.displayName, PADDING + 32, y + 15)
 
-    const valueText = row.mlAmount > 0 ? `${row.mlAmount} ml` : `${row.exactMl.toFixed(2)} ml`
+    const valueText = formatVolumeSmart(row.exactMl, params.volumeUnit)
     ctx.fillStyle = '#7de0c9'
     ctx.font = '600 14px "IBM Plex Mono", monospace'
-    ctx.fillText(valueText, WIDTH - PADDING - 90, y + 15)
+    ctx.fillText(valueText, WIDTH - PADDING - 110, y + 15)
 
     y += ROW_HEIGHT
   }

@@ -1,19 +1,22 @@
-import type { TargetedEvent } from 'preact'
 import type { FeedbackKind, UnitMode, ViewModel } from '../types'
+import type { VolumeUnit } from '../lib/units'
 import { card, segmentedButton, segmentedTrack } from '../styles'
 import { Swatch } from './ui/Swatch'
 import { RatioBar } from './RatioBar'
 import { RecipeList } from './RecipeList'
 import { ActionButtons } from './ActionButtons'
+import { BatchSizeControl } from './BatchSizeControl'
 
 interface EstimatedMixCardProps {
   vm: ViewModel
   target: string
   totalMl: number
   unitMode: UnitMode
+  volumeUnit: VolumeUnit
   feedback: FeedbackKind
   onVolumeChange: (ml: number) => void
   onSetUnitMode: (mode: UnitMode) => void
+  onSetVolumeUnit: (unit: VolumeUnit) => void
   onCopyRecipe: () => void
   onDownloadImage: () => void
   onShare: () => void
@@ -24,9 +27,11 @@ export function EstimatedMixCard({
   target,
   totalMl,
   unitMode,
+  volumeUnit,
   feedback,
   onVolumeChange,
   onSetUnitMode,
+  onSetVolumeUnit,
   onCopyRecipe,
   onDownloadImage,
   onShare,
@@ -78,21 +83,12 @@ export function EstimatedMixCard({
 
           <div style={{ height: 1, background: 'var(--divider)', marginBottom: 20 }} />
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-            <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', flex: 'none' }}>Batch size</div>
-            <input
-              type="range"
-              min={10}
-              max={1000}
-              step={10}
-              value={totalMl}
-              onInput={(e: TargetedEvent<HTMLInputElement>) => onVolumeChange(Number(e.currentTarget.value))}
-              style={{ flex: 1, accentColor: 'var(--accent)' }}
-            />
-            <div style={{ fontFamily: 'var(--mono)', fontSize: 13, width: 60, textAlign: 'right', flex: 'none' }}>
-              {totalMl} ml
-            </div>
-          </div>
+          <BatchSizeControl
+            totalMl={totalMl}
+            volumeUnit={volumeUnit}
+            onVolumeChange={onVolumeChange}
+            onUnitChange={onSetVolumeUnit}
+          />
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
             <div style={{ fontWeight: 600, fontSize: 13.5 }}>Mix ratio</div>
@@ -106,7 +102,7 @@ export function EstimatedMixCard({
                 %
               </button>
               <button type="button" onClick={() => onSetUnitMode('ml')} class="segment-btn" style={segmentedButton(unitMode === 'ml')}>
-                ml
+                Vol
               </button>
             </div>
           </div>

@@ -1,4 +1,7 @@
+import type { VolumeUnit } from './units'
+
 export const DEFAULT_TOTAL_ML = 250
+export const DEFAULT_VOLUME_UNIT: VolumeUnit = 'ml'
 
 export const DEFAULT_COLORS = [
   { hex: '#1b3f8b', name: 'Ultramarine Blue' },

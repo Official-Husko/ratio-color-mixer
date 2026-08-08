@@ -1,4 +1,5 @@
-import { SHARE_PARAM } from './constants'
+import { DEFAULT_VOLUME_UNIT, SHARE_PARAM } from './constants'
+import { isVolumeUnit } from './units'
 import type { SharePayload, UnitMode } from '../types'
 
 function isValidPayload(value: unknown): value is SharePayload {
@@ -38,6 +39,9 @@ export function decodeShareState(search: string): SharePayload | null {
       target: parsed.target,
       totalMl: parsed.totalMl,
       unitMode: parsed.unitMode as UnitMode,
+      // Optional/absent on links generated before unit selection existed —
+      // fall back rather than rejecting the whole link.
+      volumeUnit: isVolumeUnit(parsed.volumeUnit) ? parsed.volumeUnit : DEFAULT_VOLUME_UNIT,
       colors: parsed.colors.map((c) => ({ hex: c.hex, name: typeof c.name === 'string' ? c.name : '' })),
     }
   } catch {
