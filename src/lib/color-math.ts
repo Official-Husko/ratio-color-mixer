@@ -193,11 +193,15 @@ export interface SolveOptions {
  * This intentionally targets the same numeric behavior documented in
  * digitpaints_color_math_study/ALGORITHM.md (a fresh implementation of the
  * published RYB-approximation + simplex-projection technique, not a port
- * of that study's code — see its NOTICE.md). A future pass may replace this
- * with the sparse best-subset "recipe solver" sketched in
- * PAINT_MIXING_RECIPE_SOLVER_DESIGN.md; out of scope for now.
+ * of that study's code — see its NOTICE.md).
+ *
+ * This is no longer the primary solver — see solve-paint-mix.ts, which
+ * prefers the geometric solver (geometric-solver.ts) and falls back to this
+ * one. Kept here as the legacy/validation/fallback implementation per
+ * paint_mixer_optimization_docs/06_IMPLEMENTATION_ROADMAP.md ("Phase 11 —
+ * Optimizer Fallback").
  */
-export function solvePaintMix(paints: Rgb[], targetRgb: Rgb, options: SolveOptions = {}): MixResult | null {
+export function solvePaintMixIterative(paints: Rgb[], targetRgb: Rgb, options: SolveOptions = {}): MixResult | null {
   if (paints.length === 0) return null
 
   if (paints.length === 1) {
@@ -267,8 +271,9 @@ export function solvePaintMix(paints: Rgb[], targetRgb: Rgb, options: SolveOptio
   }
 }
 
-export function solvePaintMixHex(paintHexes: string[], targetHex: string, options: SolveOptions = {}): MixResult | null {
-  return solvePaintMix(paintHexes.map(hexToRgb), hexToRgb(targetHex), options)
+/** Hex convenience wrapper for {@link solvePaintMixIterative} — mainly for tests exercising the fallback path directly. */
+export function solvePaintMixIterativeHex(paintHexes: string[], targetHex: string, options: SolveOptions = {}): MixResult | null {
+  return solvePaintMixIterative(paintHexes.map(hexToRgb), hexToRgb(targetHex), options)
 }
 
 /** Presentation helper: drop rows that round to 0.0%, sort largest-first. */

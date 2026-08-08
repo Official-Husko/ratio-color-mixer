@@ -90,6 +90,17 @@ export function parseVolumeToMl(value: number, unit: VolumeUnit): number {
   return Math.max(0, unitToMl(value, unit))
 }
 
+/**
+ * The measurement granularity (in canonical mL) implied by a unit's normal
+ * display precision — e.g. 1mL for "mL" (0 decimals), or ~0.2957mL for
+ * "US fl oz" (0.01 fl oz, its 2-decimal precision). Used to round recipe
+ * volumes to amounts that are actually measurable in the selected unit,
+ * consistently with what gets displayed.
+ */
+export function stepMlFor(unit: VolumeUnit): number {
+  return unitToMl(10 ** -DISPLAY_DECIMALS[unit], unit)
+}
+
 export interface VolumePreset {
   label: string
   ml: number

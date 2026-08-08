@@ -4,9 +4,10 @@ import {
   hexToRgb,
   projectOntoSimplex,
   rgbToApproxRyb,
-  solvePaintMixHex,
+  solvePaintMixIterativeHex,
   visibleMixRows,
 } from './color-math'
+import { solvePaintMixHex } from './solve-paint-mix'
 
 describe('projectOntoSimplex', () => {
   it('always returns non-negative weights that sum to 1', () => {
@@ -50,24 +51,44 @@ describe('solvePaintMixHex canonical regression', () => {
 })
 
 describe('solvePaintMixHex live-tool cross-check', () => {
-  it('matches a mix independently recorded from the live DigitPaints tool', () => {
-    // Paints/target/expected output copied from a real session against the
-    // live tool (not from the study's fixtures) as an independent parity check.
-    const paints = ['#D1001C', '#FFE800', '#FFFEFE', '#000000', '#2A92D0']
-    const result = solvePaintMixHex(paints, '#624F4D')
+  // Paints/target/expected output copied from a real session against the
+  // live DigitPaints tool (not from the study's fixtures) as an independent
+  // parity check.
+  const paints = ['#D1001C', '#FFE800', '#FFFEFE', '#000000', '#2A92D0']
+  const target = '#624F4D'
+
+  it('the legacy iterative solver still reproduces its exact historical output unchanged', () => {
+    // This pins down that solvePaintMixIterative (the untouched fallback
+    // path) behaves exactly as it always did — a true regression check.
+    const result = solvePaintMixIterativeHex(paints, target)
 
     expect(result).not.toBeNull()
     expect(result!.mixed).toEqual({ r: 98, g: 79, b: 77 })
 
-    const rows = visibleMixRows(paints, result).map(
-      (row) => [row.hex, row.percentage.toFixed(1)] as const,
-    )
+    const rows = visibleMixRows(paints, result).map((row) => [row.hex, row.percentage.toFixed(1)] as const)
     expect(rows).toEqual([
       ['#D1001C', '38.3'],
       ['#2A92D0', '31.9'],
       ['#FFE800', '17.8'],
       ['#000000', '12.0'],
     ])
+  })
+
+  it('the public (geometric-first) solver reproduces the target exactly, using at most 4 paints', () => {
+    // The geometric solver finds a *different* exact (error-0) combination
+    // of the same 5 paints than the iterative solver above — this specific
+    // target is a genuine non-unique point in the model (more than one
+    // convex combination of these paints maps to the exact same transformed
+    // color), not a bug in either solver. Both are equally "correct"; only
+    // the specific paints chosen differ. See geometric-solver.ts.
+    const result = solvePaintMixHex(paints, target)
+
+    expect(result).not.toBeNull()
+    expect(result!.mixed).toEqual({ r: 98, g: 79, b: 77 })
+    expect(result!.error).toBeCloseTo(0)
+
+    const activeCount = result!.weights.filter((w) => w > 1e-9).length
+    expect(activeCount).toBeLessThanOrEqual(4)
   })
 })
 

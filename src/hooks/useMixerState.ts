@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks'
-import { solvePaintMixHex } from '../lib/color-math'
+import { solvePaintMixHex } from '../lib/solve-paint-mix'
 import { buildViewModel, pickSimplifiedColors } from '../lib/recipe'
 import { copyText } from '../lib/clipboard'
 import { buildShareUrl, decodeShareState } from '../lib/share-link'
