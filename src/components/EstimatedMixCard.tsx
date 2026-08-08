@@ -45,7 +45,7 @@ export function EstimatedMixCard({
   onDismissSharedLink,
 }: EstimatedMixCardProps) {
   return (
-    <div style={{ ...card, padding: 26, position: 'sticky', top: 32 }}>
+    <div class="estimated-mix-card" style={{ ...card, padding: 26, position: 'sticky', top: 32 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <h2 style={{ fontWeight: 600, fontSize: 15, margin: 0 }}>Estimated mix</h2>
         {vm.hasEnoughColors && (

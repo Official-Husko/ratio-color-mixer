@@ -42,9 +42,18 @@ export function YourColorsCard({
 
   return (
     <div style={card}>
-      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 16 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          rowGap: 8,
+          marginBottom: 16,
+        }}
+      >
         <h2 style={{ fontWeight: 600, fontSize: 15, margin: 0 }}>Your colors</h2>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', rowGap: 6 }}>
           {canSimplify && (
             <button
               type="button"

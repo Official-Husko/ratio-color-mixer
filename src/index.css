@@ -73,6 +73,39 @@ a:hover {
   }
 }
 
+/* Inline styles can't respond to viewport width, so the responsive parts of
+   the two-column layout live here instead — everything else about these
+   elements stays inline, matching the rest of the app. */
+.main-grid {
+  grid-template-columns: 1fr 1.2fr;
+  gap: 28px;
+}
+
+@media (max-width: 900px) {
+  .main-grid {
+    /* minmax(0, 1fr), not a bare 1fr — a plain 1fr track still refuses to
+       shrink narrower than its content's min-content width, which is
+       exactly backwards from what a single responsive column needs. */
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  /* Sticky-while-scrolling only makes sense next to a taller sibling column;
+     stacked single-column on mobile, it would just pin awkwardly mid-scroll. */
+  .estimated-mix-card {
+    position: static !important;
+  }
+
+  /* iOS Safari auto-zooms the whole page on focus for any text input/select
+     with a computed font-size under 16px — several of these are smaller than
+     that at their normal desktop size. */
+  input[type='text'],
+  input[type='number'],
+  select {
+    font-size: 16px;
+  }
+}
+
 /* --- interaction: hover/active feedback + light motion --- */
 
 button {

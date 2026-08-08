@@ -46,8 +46,8 @@ export function App() {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 28, alignItems: 'start' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div class="main-grid" style={{ display: 'grid', alignItems: 'start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, minWidth: 0 }}>
           <PresetsCard onAdd={actions.addPreset} />
           <YourColorsCard
             colors={colors}
